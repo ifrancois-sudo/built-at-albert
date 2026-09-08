@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { DEFAULT_LOCALE } from "@/i18n";
 import { LocaleProvider } from "@/i18n/provider";
@@ -28,11 +28,24 @@ export const metadata: Metadata = {
   description:
     "Plateforme interne Albert School : proposer une idée d'outil, voter, la construire, la livrer.",
   robots: { index: false, follow: false },
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   openGraph: {
     title: "Built at Albert",
     description: "Les outils dont les élèves ont besoin, construits par les élèves.",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#e2483c",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
