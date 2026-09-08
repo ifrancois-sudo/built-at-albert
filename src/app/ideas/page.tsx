@@ -6,6 +6,8 @@ import { useSession } from "@/lib/session";
 import { useT } from "@/i18n/provider";
 import { RequireSession } from "@/components/require-session";
 import { IdeaCard } from "@/components/idea-card";
+import { Segmented } from "@/components/segmented";
+import { Select } from "@/components/select";
 import { listFacets, listOpenIdeas, type IdeaCardModel, type IdeaSort } from "@/lib/api/ideas";
 
 export default function IdeasPage() {
@@ -72,62 +74,40 @@ function IdeasBoard() {
         </Link>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3 border-y border-rule py-3">
-        <div className="flex gap-1" role="group">
-          {(
-            [
-              ["votes", t("ideas.sortVotes")],
-              ["recent", t("ideas.sortRecent")],
-            ] as const
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={sort === value}
-              onClick={() => setSort(value)}
-              className={`btn btn-sm ${sort === value ? "btn-secondary" : "btn-ghost"}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      <div className="mt-8 flex flex-wrap items-center gap-3 border-y-2 border-ink py-4">
+        <Segmented
+          label={t("ideas.sortVotes")}
+          value={sort}
+          onChange={setSort}
+          options={[
+            { value: "votes", label: t("ideas.sortVotes") },
+            { value: "recent", label: t("ideas.sortRecent") },
+          ]}
+        />
 
         {facets.tags.length > 0 ? (
-          <label className="ml-auto flex items-center gap-2 text-sm text-ink-faint">
-            <span>{t("ideas.filterTag")}</span>
-            <select
-              className="input btn-sm w-auto"
+          <div className="ml-auto">
+            <Select
+              label={t("ideas.filterTag")}
+              placeholder={`${t("ideas.filterTag")} · ${t("ideas.filterAll")}`}
               value={tag}
-              onChange={(event) => setTag(event.target.value)}
-            >
-              <option value="">{t("ideas.filterAll")}</option>
-              {facets.tags.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={setTag}
+              options={facets.tags.map((value) => ({ value, label: value }))}
+            />
+          </div>
         ) : null}
 
         {facets.campuses.length > 0 ? (
-          <label className="flex items-center gap-2 text-sm text-ink-faint">
-            <span>{t("ideas.filterCampus")}</span>
-            <select
-              className="input btn-sm w-auto"
-              value={campus}
-              onChange={(event) => setCampus(event.target.value)}
-            >
-              <option value="">{t("ideas.filterAll")}</option>
-              {facets.campuses.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select
+            label={t("ideas.filterCampus")}
+            placeholder={`${t("ideas.filterCampus")} · ${t("ideas.filterAll")}`}
+            value={campus}
+            onChange={setCampus}
+            options={facets.campuses.map((value) => ({ value, label: value }))}
+          />
         ) : null}
       </div>
+
 
       {cards === null ? (
         <p className="mt-6 text-sm text-ink-faint">{t("common.loading")}</p>

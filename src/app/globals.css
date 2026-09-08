@@ -204,26 +204,6 @@
     font-size: 0.9375rem;
   }
 
-  /* Utility controls stay quiet: a language switcher with the same 2px rule as
-     a primary action competes with the content for no reason. */
-  .select-quiet {
-    min-height: 44px;
-    padding: 0.375rem 0.5rem;
-    background: transparent;
-    border: 1px solid var(--color-rule-strong);
-    border-radius: var(--radius-card);
-    color: var(--color-ink-soft);
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-  }
-
-  .select-quiet:hover {
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-  }
-
   .field-label {
     display: block;
     font-family: var(--font-mono);

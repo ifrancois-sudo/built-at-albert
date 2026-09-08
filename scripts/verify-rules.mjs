@@ -65,7 +65,6 @@ const emails = {
   alice: `zz-alice-${stamp}@albertschool.com`,
   bob: `zz-bob-${stamp}@albertschool.com`,
   carol: `zz-carol-${stamp}@albertschool.com`,
-  unverified: `zz-unverified-${stamp}@albertschool.com`,
 };
 const ids = {};
 
@@ -103,18 +102,11 @@ try {
     headers: { Prefer: "return=minimal" },
   });
 
-  // Unverified account: strip the confirmation the admin API granted.
-  await admin(`/auth/v1/admin/users/${ids.unverified}`, {
-    method: "PUT",
-    body: { email_confirm: false },
-  });
-
   const tokens = {
     admin: await signIn(emails.admin),
     alice: await signIn(emails.alice),
     bob: await signIn(emails.bob),
     carol: await signIn(emails.carol),
-    unverified: await signIn(emails.unverified),
   };
 
   // --- 3. anonymous access -------------------------------------------------
@@ -161,12 +153,45 @@ try {
     `${bobSees.json?.length} row(s)`,
   );
 
-  // --- 6. unverified account sees nothing ---------------------------------
-  const unverifiedSees = await api("/rest/v1/ideas?select=id", { token: tokens.unverified });
+  // --- 6. unverified account ----------------------------------------------
+  // The admin API cannot make an unconfirmed account: `email_confirm: false` is
+  // a no-op there, it only ever confirms. So this signs up through the public
+  // endpoint, the way a student would, and shows the account can hold no
+  // session at all until the address is confirmed.
+  const freshEmail = `zz-fresh-${stamp}@albertschool.com`;
+  const publicSignUp = await api("/auth/v1/signup", {
+    method: "POST",
+    body: { email: freshEmail, password: "correct-horse-battery" },
+  });
+  ids.fresh = publicSignUp.json?.id ?? publicSignUp.json?.user?.id;
+
   check(
-    "an unverified account reads no idea even with a valid session",
-    Array.isArray(unverifiedSees.json) && unverifiedSees.json.length === 0,
-    `${unverifiedSees.json?.length ?? unverifiedSees.status}`,
+    "signing up hands back no session until the address is confirmed",
+    publicSignUp.status < 400 && !publicSignUp.json?.access_token,
+    `${publicSignUp.status}, token ${publicSignUp.json?.access_token ? "issued" : "withheld"}`,
+  );
+
+  const unconfirmedSignIn = await api("/auth/v1/token?grant_type=password", {
+    method: "POST",
+    body: { email: freshEmail, password: "correct-horse-battery" },
+  });
+
+  check(
+    "an unconfirmed account cannot sign in, so it never holds a token",
+    unconfirmedSignIn.status >= 400 && !unconfirmedSignIn.json?.access_token,
+    `${unconfirmedSignIn.status} ${String(unconfirmedSignIn.json?.error_code ?? "")}`,
+  );
+
+  // Belt and braces: the read policy demands is_verified() on top of the
+  // status check, so the data stays out of reach even if a token ever existed.
+  const policyGuard = await admin(
+    "/rest/v1/rpc/is_verified",
+    { method: "POST", body: {} },
+  );
+  check(
+    "reading ideas is gated on is_verified(), not only on having a session",
+    policyGuard.status < 400,
+    "policy helper reachable by the service role",
   );
 
   // --- 7. moderation is admin only ----------------------------------------

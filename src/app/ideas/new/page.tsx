@@ -9,6 +9,7 @@ import { FormMessage } from "@/components/form-message";
 import { submitIdea } from "@/lib/api/ideas";
 import { errorMessageKey } from "@/lib/errors";
 import { LOCALES, type Locale, type MessageKey } from "@/i18n";
+import { Segmented } from "@/components/segmented";
 
 export default function NewIdeaPage() {
   return (
@@ -25,6 +26,7 @@ function NewIdeaForm() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
   const [done, setDone] = useState(false);
+  const [language, setLanguage] = useState<Locale>(locale);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,7 +44,7 @@ function NewIdeaForm() {
       title,
       problem,
       description: String(form.get("description") ?? "").trim(),
-      language: String(form.get("language") ?? locale) as Locale,
+      language,
       tags: String(form.get("tags") ?? ""),
       campus: profile?.campus ?? null,
     });
@@ -106,16 +108,13 @@ function NewIdeaForm() {
             <p className="field-hint">{t("ideas.fieldTagsHint")}</p>
           </div>
           <div>
-            <label className="field-label" htmlFor="language">
-              {t("ideas.fieldLanguage")}
-            </label>
-            <select id="language" name="language" className="input" defaultValue={locale}>
-              {LOCALES.map((value) => (
-                <option key={value} value={value}>
-                  {value.toUpperCase()}
-                </option>
-              ))}
-            </select>
+            <span className="field-label">{t("ideas.fieldLanguage")}</span>
+            <Segmented
+              label={t("ideas.fieldLanguage")}
+              value={language}
+              onChange={setLanguage}
+              options={LOCALES.map((value) => ({ value, label: value.toUpperCase() }))}
+            />
           </div>
         </div>
 

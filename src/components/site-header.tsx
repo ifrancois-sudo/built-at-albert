@@ -6,7 +6,8 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useSession } from "@/lib/session";
 import { useLocale, useT } from "@/i18n/provider";
-import { LOCALES, type Locale } from "@/i18n";
+import { LOCALES } from "@/i18n";
+import { Segmented } from "@/components/segmented";
 import { WHATSAPP_CHANNEL_URL } from "@/lib/public-config";
 
 export function SiteHeader() {
@@ -61,20 +62,13 @@ export function SiteHeader() {
             </a>
           ) : null}
 
-          <label className="inline-flex items-center gap-2 text-sm text-ink-faint">
-            <span className="sr-only">{t("common.language")}</span>
-            <select
-              className="select-quiet"
-              value={locale}
-              onChange={(event) => setLocale(event.target.value as Locale)}
-            >
-              {LOCALES.map((value) => (
-                <option key={value} value={value}>
-                  {value.toUpperCase()}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Segmented
+            size="sm"
+            label={t("common.language")}
+            value={locale}
+            onChange={setLocale}
+            options={LOCALES.map((value) => ({ value, label: value.toUpperCase() }))}
+          />
 
           {verified ? (
             <button
