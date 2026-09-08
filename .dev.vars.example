@@ -1,0 +1,18 @@
+# Copy to .dev.vars for local `wrangler dev` / `next dev`. Never commit .dev.vars.
+
+# --- Public (also mirrored in wrangler.jsonc vars) ---
+NEXT_PUBLIC_SUPABASE_URL="https://sdrlrksfefswxtmnjfmx.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="sb_publishable_qYE6EfbXOAF6PNArlxXZ7A__F1theHf"
+NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+ALLOWED_EMAIL_DOMAINS="albertschool.com"
+WHATSAPP_CHANNEL_URL="https://whatsapp.com/channel/0029Vb99R1UFXUuTnGJblY2H"
+
+# --- Secrets: server only, never prefixed NEXT_PUBLIC_ ---
+# Supabase > Project Settings > API keys > secret key (sb_secret_... or the legacy service_role JWT)
+SUPABASE_SERVICE_ROLE_KEY=""
+# resend.com > API keys
+RESEND_API_KEY=""
+RESEND_FROM="Built at Albert <no-reply@example.dev>"
+RESEND_REPLY_TO=""
+# Shared with the cron Worker; any long random string (openssl rand -hex 32)
+CRON_SECRET=""
