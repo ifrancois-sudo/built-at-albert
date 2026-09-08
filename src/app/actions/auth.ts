@@ -3,15 +3,7 @@
 import { headers } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { allowedEmailDomains, isAllowedEmail } from "@/lib/env";
-import type { MessageKey } from "@/i18n";
-
-export interface AuthFormState {
-  status: "idle" | "error" | "success";
-  messageKey?: MessageKey;
-  params?: Record<string, string>;
-}
-
-export const IDLE_AUTH_STATE: AuthFormState = { status: "idle" };
+import type { ActionState } from "@/lib/action-state";
 
 const MIN_PASSWORD_LENGTH = 12;
 
@@ -26,9 +18,9 @@ async function siteOrigin(): Promise<string> {
 }
 
 export async function signUpAction(
-  _previous: AuthFormState,
+  _previous: ActionState,
   formData: FormData,
-): Promise<AuthFormState> {
+): Promise<ActionState> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const fullName = String(formData.get("full_name") ?? "").trim();
@@ -77,9 +69,9 @@ export async function signUpAction(
 }
 
 export async function requestPasswordResetAction(
-  _previous: AuthFormState,
+  _previous: ActionState,
   formData: FormData,
-): Promise<AuthFormState> {
+): Promise<ActionState> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
 
   if (isAllowedEmail(email)) {
@@ -94,7 +86,7 @@ export async function requestPasswordResetAction(
   return { status: "success", messageKey: "auth.forgotDone" };
 }
 
-export async function resendVerificationAction(): Promise<AuthFormState> {
+export async function resendVerificationAction(): Promise<ActionState> {
   const supabase = await createServerSupabase();
   const {
     data: { user },

@@ -1,13 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
-import { IDLE_AUTH_STATE, signUpAction } from "@/app/actions/auth";
+import { signUpAction } from "@/app/actions/auth";
+import { IDLE_STATE } from "@/lib/action-state";
 import { useT } from "@/i18n/provider";
 import { FormMessage } from "@/components/form-message";
 
 export function SignUpForm({ domains }: { domains: string }) {
   const t = useT();
-  const [state, action, pending] = useActionState(signUpAction, IDLE_AUTH_STATE);
+  const [state, action, pending] = useActionState(signUpAction, IDLE_STATE);
 
   if (state.status === "success" && state.messageKey) {
     return (

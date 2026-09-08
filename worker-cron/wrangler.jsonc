@@ -1,0 +1,21 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "built-at-albert-cron",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": {
+    "crons": [
+      // 06:00 UTC daily — expire overdue claims and send the J+14 / J+19 reminders.
+      "0 6 * * *",
+      // 08:00 UTC Monday — weekly digest.
+      "0 8 * * 1"
+    ]
+  },
+  "vars": {
+    "APP_URL": "https://built-at-albert.workers.dev"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

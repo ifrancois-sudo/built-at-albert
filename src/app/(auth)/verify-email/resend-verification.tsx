@@ -1,17 +1,18 @@
 "use client";
 
 import { useActionState } from "react";
-import { IDLE_AUTH_STATE, resendVerificationAction, type AuthFormState } from "@/app/actions/auth";
+import { resendVerificationAction } from "@/app/actions/auth";
+import { IDLE_STATE, type ActionState } from "@/lib/action-state";
 import { useT } from "@/i18n/provider";
 import { FormMessage } from "@/components/form-message";
 
-async function resend(): Promise<AuthFormState> {
+async function resend(): Promise<ActionState> {
   return resendVerificationAction();
 }
 
 export function ResendVerification() {
   const t = useT();
-  const [state, action, pending] = useActionState(resend, IDLE_AUTH_STATE);
+  const [state, action, pending] = useActionState(resend, IDLE_STATE);
 
   return (
     <form action={action} className="mt-6 flex flex-col gap-4">
