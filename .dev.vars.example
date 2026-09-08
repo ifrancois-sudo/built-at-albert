@@ -16,3 +16,6 @@ RESEND_FROM="Built at Albert <no-reply@example.dev>"
 RESEND_REPLY_TO=""
 # Shared with the cron Worker; any long random string (openssl rand -hex 32)
 CRON_SECRET=""
+# Only used by scripts/db-push.sh to apply migrations. Supabase dashboard >
+# Project Settings > Database > Connection string (URI), password included.
+SUPABASE_DB_URL=""
