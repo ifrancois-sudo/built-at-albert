@@ -20,7 +20,8 @@ if (!SERVICE) {
 let pass = 0, fail = 0;
 const check = (name, ok, detail = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? `  — ${detail}` : ""}`);
-  ok ? pass++ : fail++;
+  if (ok) pass += 1;
+  else fail += 1;
 };
 
 const api = async (path, { token = ANON, method = "GET", body, headers = {} } = {}) => {
