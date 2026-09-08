@@ -203,5 +203,25 @@
     "already_claimed": "Someone just claimed this idea.",
     "reason_required": "A reason is required to reject an idea.",
     "cannot_demote_self": "You cannot remove your own admin role."
+  },
+  "home": {
+    "greeting": "Hello {name}",
+    "title": "What is moving right now",
+    "statOpen": "open ideas",
+    "statClaimed": "being built",
+    "statDelivered": "tools shipped",
+    "claimsTitle": "You have made a commitment",
+    "claimsBody": "There is still time, but the idea reopens if you do not ship.",
+    "topTitle": "Most voted",
+    "topAll": "See all {count} ideas",
+    "shippedTitle": "Latest shipped tools",
+    "shippedAll": "Open the gallery",
+    "shippedEmpty": "Nobody has shipped yet. The first card in the gallery will be yours.",
+    "ctaTitle": "Missing a tool?",
+    "ctaBody": "Describe the problem in two minutes. If your class votes for it, someone will build it.",
+    "ctaButton": "Post an idea",
+    "buildTitle": "Can you build?",
+    "buildBody": "Claim an idea in one click. You get {days} days, and you can release it whenever you want.",
+    "buildButton": "Browse the open ideas"
   }
 }

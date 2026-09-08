@@ -203,5 +203,25 @@
     "already_claimed": "Quelqu'un vient de réserver cette idée.",
     "reason_required": "Un motif est obligatoire pour refuser une idée.",
     "cannot_demote_self": "Tu ne peux pas retirer ton propre rôle admin."
+  },
+  "home": {
+    "greeting": "Bonjour {name}",
+    "title": "Ce qui bouge en ce moment",
+    "statOpen": "idées ouvertes",
+    "statClaimed": "en construction",
+    "statDelivered": "outils livrés",
+    "claimsTitle": "Tu as pris un engagement",
+    "claimsBody": "Il te reste du temps, mais l'idée repart en libre si tu ne livres pas.",
+    "topTitle": "Les plus votées",
+    "topAll": "Voir les {count} idées",
+    "shippedTitle": "Derniers outils livrés",
+    "shippedAll": "Voir la galerie",
+    "shippedEmpty": "Personne n'a encore livré. La première fiche de la galerie sera la tienne.",
+    "ctaTitle": "Il te manque un outil ?",
+    "ctaBody": "Décris le problème en deux minutes. Si la promo vote pour, quelqu'un le construira.",
+    "ctaButton": "Proposer une idée",
+    "buildTitle": "Tu sais construire ?",
+    "buildBody": "Réserve une idée en un clic. Tu as {days} jours, et tu peux la libérer quand tu veux.",
+    "buildButton": "Parcourir les idées ouvertes"
   }
 }

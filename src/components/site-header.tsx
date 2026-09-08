@@ -27,7 +27,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-paper/92 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-7 gap-y-3 px-5 py-3.5 sm:px-8">
-        <Link href={verified ? "/ideas/" : "/"} className="font-display text-2xl leading-none">
+        <Link href="/" className="font-display text-2xl leading-none">
           Built <span className="text-accent italic">at</span> Albert
         </Link>
 
