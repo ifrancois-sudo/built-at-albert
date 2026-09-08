@@ -92,7 +92,7 @@ export function DeliveryForm({
     <form onSubmit={onSubmit} className="mt-5 flex flex-col gap-4 border-t border-rule pt-5">
       <div>
         <h3 className="text-lg">{t("delivery.title")}</h3>
-        <p className="prose-body mt-1 text-sm">{t("delivery.subtitle")}</p>
+        <p className="prose-body mt-2">{t("delivery.subtitle")}</p>
       </div>
 
       {error ? <FormMessage tone="error" messageKey={error} /> : null}

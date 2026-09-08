@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="animate-rise">
       <h1 className="text-3xl">{t("auth.forgotTitle")}</h1>
-      <p className="prose-body mt-2 text-sm">{t("auth.forgotBody")}</p>
+      <p className="prose-body mt-2">{t("auth.forgotBody")}</p>
 
       {done ? (
         <div className="mt-6">

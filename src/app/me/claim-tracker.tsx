@@ -52,7 +52,7 @@ export function ClaimTracker({
           <Link href={`/idea/?id=${claim.idea_id}`} className="text-lg hover:text-accent-ink">
             {ideaTitle}
           </Link>
-          <p className="mt-1 text-sm text-ink-faint">
+          <p className="mt-2 text-ink-faint">
             {t("ideas.claimedUntil", { date: formatDate(claim.expires_at, locale) })}
           </p>
         </div>
@@ -70,7 +70,7 @@ export function ClaimTracker({
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"
-          className="btn btn-primary h-10 min-h-0"
+          className="btn btn-primary"
           aria-expanded={delivering}
           onClick={() => setDelivering((open) => !open)}
         >
@@ -78,7 +78,7 @@ export function ClaimTracker({
         </button>
         <button
           type="button"
-          className="btn btn-secondary h-10 min-h-0"
+          className="btn btn-secondary"
           disabled={pending}
           onClick={() => run(() => extendClaim(claim.id), "claim.extended")}
         >
@@ -86,7 +86,7 @@ export function ClaimTracker({
         </button>
         <button
           type="button"
-          className="btn btn-danger h-10 min-h-0"
+          className="btn btn-danger"
           disabled={pending}
           onClick={() => run(() => releaseClaim(claim.id), "claim.released")}
         >

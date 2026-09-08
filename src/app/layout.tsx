@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Instrument_Serif } from "next/font/google";
+import { Archivo, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { DEFAULT_LOCALE } from "@/i18n";
 import { LocaleProvider } from "@/i18n/provider";
 import { SessionProvider } from "@/lib/session";
@@ -8,7 +8,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { SITE_URL } from "@/lib/public-config";
 import "./globals.css";
 
-const sans = Geist({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+// Archivo carries more character than a neutral UI grotesque, which the
+// editorial direction needs; the mono is reserved for labels and metadata.
+const sans = Archivo({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 const display = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
@@ -36,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     // The page is built once as a static file, so the language attribute starts
     // at the default and LocaleProvider corrects it on mount.
-    <html lang={DEFAULT_LOCALE} className={`${sans.variable} ${display.variable}`}>
+    <html lang={DEFAULT_LOCALE} className={`${sans.variable} ${display.variable} ${mono.variable}`}>
       <body className="flex min-h-dvh flex-col">
         <SessionProvider>
           <LocaleProvider>

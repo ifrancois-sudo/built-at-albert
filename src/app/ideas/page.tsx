@@ -61,11 +61,11 @@ function IdeasBoard() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl">{t("ideas.listTitle")}</h1>
-          <p className="prose-body mt-1.5 text-sm">{t("ideas.listSubtitle")}</p>
+          <p className="prose-body mt-2">{t("ideas.listSubtitle")}</p>
         </div>
         <Link href="/ideas/new/" className="btn btn-primary">
           {t("ideas.newCta")}
@@ -85,7 +85,7 @@ function IdeasBoard() {
               type="button"
               aria-pressed={sort === value}
               onClick={() => setSort(value)}
-              className={`btn h-9 min-h-0 px-3 text-sm ${sort === value ? "btn-secondary" : "btn-ghost"}`}
+              className={`btn btn-sm ${sort === value ? "btn-secondary" : "btn-ghost"}`}
             >
               {label}
             </button>
@@ -96,7 +96,7 @@ function IdeasBoard() {
           <label className="ml-auto flex items-center gap-2 text-sm text-ink-faint">
             <span>{t("ideas.filterTag")}</span>
             <select
-              className="input h-9 min-h-0 w-auto py-1 text-sm"
+              className="input btn-sm w-auto"
               value={tag}
               onChange={(event) => setTag(event.target.value)}
             >
@@ -114,7 +114,7 @@ function IdeasBoard() {
           <label className="flex items-center gap-2 text-sm text-ink-faint">
             <span>{t("ideas.filterCampus")}</span>
             <select
-              className="input h-9 min-h-0 w-auto py-1 text-sm"
+              className="input btn-sm w-auto"
               value={campus}
               onChange={(event) => setCampus(event.target.value)}
             >
@@ -132,7 +132,7 @@ function IdeasBoard() {
       {cards === null ? (
         <p className="mt-6 text-sm text-ink-faint">{t("common.loading")}</p>
       ) : cards.length === 0 ? (
-        <p className="surface mt-6 p-8 text-center text-sm text-ink-faint">{t("ideas.empty")}</p>
+        <p className="surface mt-6 p-10 text-center text-ink-faint">{t("ideas.empty")}</p>
       ) : (
         <div className="mt-6 flex flex-col gap-3">
           {cards.map((card) => (

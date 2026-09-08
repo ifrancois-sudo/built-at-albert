@@ -3,12 +3,14 @@
 import { useT } from "@/i18n/provider";
 import type { IdeaStatus } from "@/lib/database.types";
 
+// Open is the only status that gets a filled badge: it is the one a student can
+// act on, and it should be the loudest thing in a row of labels.
 const TONE: Record<IdeaStatus, string> = {
-  pending: "bg-paper-sunk text-ink-faint",
-  open: "bg-accent-soft text-accent-ink",
-  claimed: "bg-signal-soft text-signal",
-  delivered: "bg-good-soft text-good",
-  rejected: "bg-bad-soft text-bad",
+  pending: "text-ink-faint",
+  open: "badge-solid bg-accent",
+  claimed: "text-signal",
+  delivered: "badge-solid bg-good",
+  rejected: "text-bad",
 };
 
 export function StatusBadge({ status }: { status: IdeaStatus }) {

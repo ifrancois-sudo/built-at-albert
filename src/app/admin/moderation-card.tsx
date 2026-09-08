@@ -40,14 +40,14 @@ export function ModerationCard({
   return (
     <article className="surface p-5">
       <h3 className="text-lg leading-snug">{idea.title}</h3>
-      <p className="mt-1 text-xs text-ink-faint">
+      <p className="meta mt-2">
         {t("ideas.byAuthor", { name: authorName })} · {createdLabel}
         {idea.tags.length > 0 ? ` · ${idea.tags.map((tag) => `#${tag}`).join(" ")}` : ""}
       </p>
 
-      <p className="prose-body mt-3 whitespace-pre-line text-sm">{idea.problem}</p>
+      <p className="prose-body mt-3 whitespace-pre-line">{idea.problem}</p>
       {idea.description ? (
-        <p className="prose-body mt-2 whitespace-pre-line text-sm">{idea.description}</p>
+        <p className="prose-body mt-3 whitespace-pre-line">{idea.description}</p>
       ) : null}
 
       {error ? (
@@ -74,7 +74,7 @@ export function ModerationCard({
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"
-          className="btn btn-primary h-10 min-h-0"
+          className="btn btn-primary"
           disabled={pending || rejecting}
           onClick={() => decide(true)}
         >
@@ -85,7 +85,7 @@ export function ModerationCard({
           <>
             <button
               type="button"
-              className="btn btn-danger h-10 min-h-0"
+              className="btn btn-danger"
               disabled={pending}
               onClick={() => decide(false)}
             >
@@ -93,7 +93,7 @@ export function ModerationCard({
             </button>
             <button
               type="button"
-              className="btn btn-ghost h-10 min-h-0"
+              className="btn btn-ghost"
               onClick={() => setRejecting(false)}
             >
               {t("common.cancel")}
@@ -102,7 +102,7 @@ export function ModerationCard({
         ) : (
           <button
             type="button"
-            className="btn btn-secondary h-10 min-h-0"
+            className="btn btn-secondary"
             onClick={() => setRejecting(true)}
           >
             {t("admin.reject")}

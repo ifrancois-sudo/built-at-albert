@@ -116,14 +116,14 @@ function AdminConsole() {
 
   if (!data) {
     return (
-      <p className="mx-auto max-w-4xl px-4 py-20 text-sm text-ink-faint sm:px-6">
+      <p className="mx-auto max-w-4xl px-4 py-24 text-ink-faint sm:px-6">
         {t("common.loading")}
       </p>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6">
       <h1 className="text-3xl">{t("admin.title")}</h1>
 
       {message ? (
@@ -140,7 +140,7 @@ function AdminConsole() {
           ) : null}
         </h2>
         {data.pending.length === 0 ? (
-          <p className="surface mt-4 p-6 text-sm text-ink-faint">{t("admin.queueEmpty")}</p>
+          <p className="surface mt-4 p-7 text-ink-faint">{t("admin.queueEmpty")}</p>
         ) : (
           <div className="mt-4 flex flex-col gap-4">
             {data.pending.map((idea) => (
@@ -159,7 +159,7 @@ function AdminConsole() {
       <section className="mt-12">
         <h2 className="text-xl">{t("admin.claims")}</h2>
         {data.claims.length === 0 ? (
-          <p className="surface mt-4 p-6 text-sm text-ink-faint">{t("admin.claimsEmpty")}</p>
+          <p className="surface mt-4 p-7 text-ink-faint">{t("admin.claimsEmpty")}</p>
         ) : (
           <ul className="mt-4 flex flex-col gap-2">
             {data.claims.map((claim) => (
@@ -167,13 +167,13 @@ function AdminConsole() {
                 <Link href={`/idea/?id=${claim.idea_id}`} className="flex-1 hover:text-accent-ink">
                   {data.titles.get(claim.idea_id) ?? "—"}
                 </Link>
-                <span className="text-sm text-ink-faint">
+                <span className="text-ink-faint">
                   {displayName(data.people.get(claim.user_id), "—")} ·{" "}
                   {t("ideas.claimedUntil", { date: formatDate(claim.expires_at, locale) })}
                 </span>
                 <button
                   type="button"
-                  className="btn btn-danger h-9 min-h-0 px-3 text-sm"
+                  className="btn btn-danger btn-sm"
                   disabled={busy}
                   onClick={() => run(() => releaseClaim(claim.id), "claim.released")}
                 >
@@ -196,7 +196,7 @@ function AdminConsole() {
                   href={project.url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="block truncate text-xs text-ink-faint underline underline-offset-4"
+                  className="meta block truncate underline underline-offset-4"
                 >
                   {project.url}
                 </a>
@@ -206,7 +206,7 @@ function AdminConsole() {
               ) : null}
               <button
                 type="button"
-                className={`btn h-9 min-h-0 px-3 text-sm ${project.is_public ? "btn-danger" : "btn-secondary"}`}
+                className={`btn btn-sm ${project.is_public ? "btn-danger" : "btn-secondary"}`}
                 disabled={busy}
                 onClick={() =>
                   run(
@@ -220,7 +220,7 @@ function AdminConsole() {
             </li>
           ))}
           {data.projects.length === 0 ? (
-            <li className="surface p-6 text-sm text-ink-faint">{t("gallery.empty")}</li>
+            <li className="surface p-7 text-ink-faint">{t("gallery.empty")}</li>
           ) : null}
         </ul>
       </section>
@@ -241,7 +241,7 @@ function AdminConsole() {
                       <span className="badge ml-2 bg-accent-soft text-accent-ink">admin</span>
                     ) : null}
                   </p>
-                  <p className="text-xs text-ink-faint">
+                  <p className="meta">
                     {[member.promo, member.campus].filter(Boolean).join(" · ") || "—"}
                   </p>
                 </div>
@@ -249,11 +249,11 @@ function AdminConsole() {
                 {/* An admin cannot demote themselves, so the platform is never
                     left with nobody able to moderate. */}
                 {isSelf ? (
-                  <span className="text-xs text-ink-faint">—</span>
+                  <span className="meta">—</span>
                 ) : (
                   <button
                     type="button"
-                    className="btn btn-secondary h-9 min-h-0 px-3 text-sm"
+                    className="btn btn-secondary btn-sm"
                     disabled={busy}
                     onClick={() =>
                       run(

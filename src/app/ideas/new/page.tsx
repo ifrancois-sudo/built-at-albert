@@ -54,7 +54,7 @@ function NewIdeaForm() {
 
   if (done) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-2xl px-5 py-14 sm:px-6">
         <div className="flex flex-col items-start gap-4">
           <FormMessage tone="success" messageKey="ideas.newDone" />
           <Link href="/ideas/" className="btn btn-secondary">
@@ -66,9 +66,9 @@ function NewIdeaForm() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-2xl px-5 py-14 sm:px-6">
       <h1 className="text-3xl">{t("ideas.newTitle")}</h1>
-      <p className="prose-body mt-1.5 text-sm">{t("ideas.newSubtitle")}</p>
+      <p className="prose-body mt-2">{t("ideas.newSubtitle")}</p>
 
       <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-5">
         {error ? <FormMessage tone="error" messageKey={error} /> : null}

@@ -45,14 +45,14 @@ function Gallery() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6">
       <h1 className="text-3xl">{t("gallery.title")}</h1>
-      <p className="prose-body mt-1.5 text-sm">{t("gallery.subtitle")}</p>
+      <p className="prose-body mt-2">{t("gallery.subtitle")}</p>
 
       {projects === null ? (
         <p className="mt-8 text-sm text-ink-faint">{t("common.loading")}</p>
       ) : projects.length === 0 ? (
-        <p className="surface mt-8 p-8 text-center text-sm text-ink-faint">{t("gallery.empty")}</p>
+        <p className="surface mt-8 p-10 text-center text-ink-faint">{t("gallery.empty")}</p>
       ) : (
         <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
@@ -75,8 +75,8 @@ function Gallery() {
                     {titles.get(project.idea_id) ?? "—"}
                   </Link>
                 </h2>
-                <p className="prose-body mt-2 line-clamp-3 flex-1 text-sm">{project.description}</p>
-                <p className="mt-3 text-xs text-ink-faint">
+                <p className="prose-body mt-3 line-clamp-3 flex-1">{project.description}</p>
+                <p className="meta mt-4">
                   {t("ideas.byAuthor", { name: displayName(authors.get(project.author_id), "—") })}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -84,7 +84,7 @@ function Gallery() {
                     href={project.url}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="btn btn-primary h-9 min-h-0 px-3 text-sm"
+                    className="btn btn-primary btn-sm"
                   >
                     {t("gallery.openTool")}
                   </a>
@@ -93,7 +93,7 @@ function Gallery() {
                       href={project.repo_url}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="btn btn-secondary h-9 min-h-0 px-3 text-sm"
+                      className="btn btn-secondary btn-sm"
                     >
                       {t("gallery.viewRepo")}
                     </a>

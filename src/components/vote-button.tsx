@@ -4,6 +4,11 @@ import { useState, useTransition } from "react";
 import { toggleVote } from "@/lib/api/ideas";
 import { useT } from "@/i18n/provider";
 
+/**
+ * The vote is the central gesture of the whole platform, so the count is set as
+ * a printed numeral rather than tucked into a chip. Nothing else on a card is
+ * this large.
+ */
 export function VoteButton({
   ideaId,
   userId,
@@ -21,19 +26,27 @@ export function VoteButton({
   const [state, setState] = useState({ count, hasVoted });
   const [pending, startTransition] = useTransition();
 
+  const label = t.plural("ideas.voteCount", "ideas.voteCountPlural", state.count).replace(
+    String(state.count),
+    "",
+  );
+
   if (isOwn) {
     return (
-      <span className="badge bg-paper-sunk text-ink-faint" title={t("ideas.voteOwn")}>
-        {t.plural("ideas.voteCount", "ideas.voteCountPlural", state.count)}
-      </span>
+      <div className="min-w-[96px] text-center" title={t("ideas.voteOwn")}>
+        <span className="tally block text-ink-faint">{state.count}</span>
+        <span className="meta mt-1 block">{label.trim()}</span>
+      </div>
     );
   }
 
   function onClick() {
     // Move the count immediately, then put it back if the write is refused.
     const previous = state;
-    const next = { count: state.hasVoted ? state.count - 1 : state.count + 1, hasVoted: !state.hasVoted };
-    setState(next);
+    setState({
+      count: state.hasVoted ? state.count - 1 : state.count + 1,
+      hasVoted: !state.hasVoted,
+    });
 
     startTransition(async () => {
       const { error } = await toggleVote(ideaId, userId, previous.hasVoted);
@@ -46,11 +59,17 @@ export function VoteButton({
       type="button"
       aria-pressed={state.hasVoted}
       disabled={pending}
-      className={`btn h-9 min-h-0 px-3 text-sm ${state.hasVoted ? "btn-primary" : "btn-secondary"}`}
       onClick={onClick}
+      className={`group min-w-[96px] rounded-[5px] border-2 px-3 py-2.5 text-center transition-colors ${
+        state.hasVoted
+          ? "border-accent bg-accent text-white"
+          : "border-transparent hover:border-rule-strong"
+      } ${pending ? "opacity-60" : ""}`}
     >
-      <span aria-hidden>{state.hasVoted ? "▲" : "△"}</span>
-      <span>{t.plural("ideas.voteCount", "ideas.voteCountPlural", state.count)}</span>
+      <span className={`tally block ${state.hasVoted ? "text-white" : ""}`}>{state.count}</span>
+      <span className={`meta mt-1 block ${state.hasVoted ? "text-white" : ""}`}>
+        {state.hasVoted ? t("ideas.voted") : label.trim()}
+      </span>
     </button>
   );
 }

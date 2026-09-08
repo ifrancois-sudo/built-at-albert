@@ -38,7 +38,7 @@ export function RequireSession({
 
   if (loading || !user || !verified || (admin && !isAdmin)) {
     return (
-      <p className="mx-auto max-w-4xl px-4 py-20 text-sm text-ink-faint sm:px-6">
+      <p className="mx-auto max-w-4xl px-4 py-24 text-ink-faint sm:px-6">
         {t("common.loading")}
       </p>
     );

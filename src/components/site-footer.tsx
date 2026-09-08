@@ -7,16 +7,16 @@ export function SiteFooter() {
   const t = useT();
 
   return (
-    <footer className="mt-20 border-t border-rule">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-ink-faint sm:px-6">
-        <p>
+    <footer className="mt-24 border-t-2 border-ink">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-9 sm:px-8">
+        <p className="meta">
           {t("common.appName")} — {t("common.tagline")}
         </p>
         <a
           href={WHATSAPP_CHANNEL_URL}
           target="_blank"
           rel="noreferrer noopener"
-          className="underline underline-offset-4 hover:text-ink"
+          className="meta underline underline-offset-4 hover:text-accent"
         >
           {t("nav.whatsapp")}
         </a>

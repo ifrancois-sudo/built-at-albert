@@ -42,7 +42,7 @@ export default function AuthCallbackPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-20 sm:px-0">
-      <p className="text-sm text-ink-faint">
+      <p className="text-ink-faint">
         {failed ? t("common.genericError") : t("common.loading")}
       </p>
       {failed ? (

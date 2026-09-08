@@ -33,7 +33,7 @@ export default function VerifyEmailPage() {
   }
 
   if (loading || !user) {
-    return <p className="text-sm text-ink-faint">{t("common.loading")}</p>;
+    return <p className="text-ink-faint">{t("common.loading")}</p>;
   }
 
   return (

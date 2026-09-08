@@ -66,7 +66,7 @@ export default function SignUpPage() {
   return (
     <div className="animate-rise">
       <h1 className="text-3xl">{t("auth.signupTitle")}</h1>
-      <p className="prose-body mt-2 text-sm">{t("auth.emailHint", { domains })}</p>
+      <p className="prose-body mt-2">{t("auth.emailHint", { domains })}</p>
 
       {done ? (
         <div className="mt-6">

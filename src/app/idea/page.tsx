@@ -57,13 +57,13 @@ function IdeaDetail() {
   }, [load]);
 
   if (detail === undefined) {
-    return <p className="mx-auto max-w-3xl px-4 py-20 text-sm text-ink-faint sm:px-6">{t("common.loading")}</p>;
+    return <p className="mx-auto max-w-3xl px-4 py-24 text-ink-faint sm:px-6">{t("common.loading")}</p>;
   }
 
   if (detail === null) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
-        <p className="text-sm text-ink-faint">{t("errors.idea_not_found")}</p>
+      <div className="mx-auto max-w-3xl px-5 py-24 sm:px-6">
+        <p className="text-ink-faint">{t("errors.idea_not_found")}</p>
         <Link href="/ideas/" className="btn btn-secondary mt-4">
           {t("common.back")}
         </Link>
@@ -92,7 +92,7 @@ function IdeaDetail() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-3xl px-5 py-14 sm:px-6">
       <Link href="/ideas/" className="text-sm text-ink-faint underline underline-offset-4 hover:text-ink">
         {t("common.back")}
       </Link>
@@ -113,7 +113,7 @@ function IdeaDetail() {
           hasVoted={detail.hasVoted}
           isOwn={isAuthor}
         />
-        <p className="text-sm text-ink-faint">
+        <p className="text-ink-faint">
           {t("ideas.byAuthor", { name: displayName(author, "—") })} ·{" "}
           {formatDate(idea.created_at, locale)}
         </p>
@@ -161,7 +161,7 @@ function IdeaDetail() {
       {project ? (
         <section className="surface mt-10 p-6">
           <h2 className="text-xl">{t("gallery.openTool")}</h2>
-          <p className="prose-body mt-2 text-sm">{project.description}</p>
+          <p className="prose-body mt-2">{project.description}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <a href={project.url} target="_blank" rel="noreferrer noopener" className="btn btn-primary">
               {t("ideas.deliveredCta")}
@@ -180,7 +180,7 @@ function IdeaDetail() {
         </section>
       ) : activeClaim ? (
         <section className="surface mt-10 p-6">
-          <p className="text-sm">
+          <p >
             {t("ideas.claimedBy", { name: displayName(claimant, "—") })}{" "}
             <span className="text-ink-faint">
               {t("ideas.claimedUntil", { date: formatDate(activeClaim.expires_at, locale) })}
@@ -208,7 +208,7 @@ function IdeaDetail() {
           {showRules ? (
             <>
               <h2 className="text-xl">{t("claim.rulesTitle")}</h2>
-              <ul className="prose-body mt-3 list-disc space-y-1.5 pl-5 text-sm">
+              <ul className="prose-body mt-4 list-disc space-y-2.5 pl-5">
                 <li>{t("claim.rule1", { days: CLAIM_DAYS })}</li>
                 <li>{t("claim.rule2", { extension: CLAIM_EXTENSION_DAYS })}</li>
                 <li>{t("claim.rule3")}</li>
@@ -231,7 +231,7 @@ function IdeaDetail() {
           ) : (
             <>
               <h2 className="text-xl">{t("claim.cta")}</h2>
-              <p className="prose-body mt-2 text-sm">{t("claim.rule1", { days: CLAIM_DAYS })}</p>
+              <p className="prose-body mt-2">{t("claim.rule1", { days: CLAIM_DAYS })}</p>
               <button type="button" className="btn btn-primary mt-4" onClick={() => setShowRules(true)}>
                 {t("claim.cta")}
               </button>

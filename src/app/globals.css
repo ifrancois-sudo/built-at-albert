@@ -1,38 +1,50 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Design tokens
-   Paper-and-ink base with one electric accent. Amber is reserved for
-   time-sensitive states (a claim running out), so it never appears decoratively.
+   Design tokens — direction "Atelier"
+   Warm paper, near-black ink, one frank vermilion. The energy comes from scale
+   and weight, not from a wide palette: a single accent used sparingly reads as
+   deliberate, where three accents read as decoration.
 --------------------------------------------------------------------------- */
 
 @theme {
-  --color-paper: #faf8f4;
+  --color-paper: #f4f1ea;
   --color-paper-raised: #ffffff;
-  --color-paper-sunk: #f2efe8;
-  --color-ink: #14130f;
-  --color-ink-soft: #4b483f;
-  --color-ink-faint: #7b776b;
-  --color-rule: #e2ded3;
-  --color-rule-strong: #cdc7b8;
+  --color-paper-sunk: #eae5d8;
+  --color-ink: #12100c;
+  --color-ink-soft: #57513f;
+  --color-ink-faint: #7d7663;
+  --color-rule: #dcd5c4;
+  --color-rule-strong: #c4bba4;
 
-  --color-accent: #3a2fd6;
-  --color-accent-soft: #ece9ff;
-  --color-accent-ink: #241c9c;
+  --color-accent: #e2483c;
+  --color-accent-soft: #fbe7e4;
+  --color-accent-ink: #ab2f25;
 
-  --color-signal: #b45309;
-  --color-signal-soft: #fdf0dd;
+  /* Reserved for a claim running out of time, nowhere else. */
+  --color-signal: #8a5200;
+  --color-signal-soft: #f7ead4;
 
-  --color-good: #15704a;
-  --color-good-soft: #e2f3ea;
+  /* Delivered. Deep enough to sit next to the vermilion without fighting it. */
+  --color-good: #1b4d3e;
+  --color-good-soft: #dcebe4;
 
-  --color-bad: #a41f2b;
-  --color-bad-soft: #fbe8e9;
+  --color-bad: #9c1f2b;
+  --color-bad-soft: #f9e2e1;
 
-  --font-display: var(--font-display), Georgia, "Times New Roman", serif;
+  --font-display: var(--font-display), "Instrument Serif", Georgia, serif;
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
 
-  --radius-card: 14px;
+  /* Printed-matter corners: nearly square, never pill-soft. */
+  --radius-card: 5px;
+
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.62;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.55;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.4;
 }
 
 @layer base {
@@ -44,16 +56,20 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: "cv05" 1, "ss01" 1;
+    /* 17px body. The old 14px default was the single biggest reason the
+       interface read as an admin tool rather than a place to spend time. */
+    font-size: 1.0625rem;
+    line-height: 1.62;
     -webkit-font-smoothing: antialiased;
   }
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     font-family: var(--font-display);
     font-weight: 400;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
 
@@ -61,17 +77,15 @@
     text-wrap: pretty;
   }
 
-  /* One visible focus treatment everywhere, including for keyboard users who
-     land on a card link rather than a button. */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 3px solid var(--color-accent);
     outline-offset: 3px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   ::selection {
-    background: var(--color-accent-soft);
-    color: var(--color-accent-ink);
+    background: var(--color-accent);
+    color: #ffffff;
   }
 }
 
@@ -80,10 +94,33 @@
 --------------------------------------------------------------------------- */
 
 @layer components {
+  /* Printed card: a real 2px rule, not a hairline that disappears on a laptop
+     screen at arm's length. */
   .surface {
     background: var(--color-paper-raised);
-    border: 1px solid var(--color-rule);
+    border: 2px solid var(--color-ink);
     border-radius: var(--radius-card);
+  }
+
+  .surface-quiet {
+    background: var(--color-paper-raised);
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius-card);
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    color: var(--color-ink-faint);
   }
 
   .btn {
@@ -91,20 +128,24 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-height: 44px;
-    padding: 0.625rem 1.125rem;
-    border-radius: 10px;
-    border: 1px solid transparent;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    line-height: 1.2;
+    min-height: 52px;
+    padding: 0.8125rem 1.5rem;
+    border-radius: var(--radius-card);
+    border: 2px solid var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: inherit;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.15;
+    white-space: nowrap;
     cursor: pointer;
-    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease,
-      transform 140ms ease;
+    transition: background-color 130ms ease, color 130ms ease, transform 130ms ease,
+      border-color 130ms ease;
   }
 
   .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
   }
 
@@ -114,67 +155,101 @@
 
   .btn-primary {
     background: var(--color-accent);
+    border-color: var(--color-accent);
     color: #ffffff;
   }
 
   .btn-primary:not(:disabled):hover {
     background: var(--color-accent-ink);
+    border-color: var(--color-accent-ink);
   }
 
   .btn-secondary {
-    background: var(--color-paper-raised);
-    border-color: var(--color-rule-strong);
+    background: transparent;
     color: var(--color-ink);
   }
 
   .btn-secondary:not(:disabled):hover {
-    background: var(--color-paper-sunk);
+    background: var(--color-ink);
+    color: var(--color-paper);
   }
 
   .btn-ghost {
     background: transparent;
+    border-color: transparent;
     color: var(--color-ink-soft);
+    font-weight: 500;
   }
 
   .btn-ghost:not(:disabled):hover {
-    background: var(--color-paper-sunk);
     color: var(--color-ink);
+    border-color: var(--color-rule-strong);
   }
 
   .btn-danger {
-    background: var(--color-bad-soft);
-    border-color: color-mix(in srgb, var(--color-bad) 25%, transparent);
+    background: transparent;
+    border-color: var(--color-bad);
     color: var(--color-bad);
   }
 
   .btn-danger:not(:disabled):hover {
-    background: color-mix(in srgb, var(--color-bad) 15%, var(--color-paper));
+    background: var(--color-bad);
+    color: #ffffff;
+  }
+
+  /* Small variant: still 44px tall, the minimum a thumb can hit reliably. */
+  .btn-sm {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  /* Utility controls stay quiet: a language switcher with the same 2px rule as
+     a primary action competes with the content for no reason. */
+  .select-quiet {
+    min-height: 44px;
+    padding: 0.375rem 0.5rem;
+    background: transparent;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius-card);
+    color: var(--color-ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+
+  .select-quiet:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
   }
 
   .field-label {
     display: block;
+    font-family: var(--font-mono);
     font-size: 0.8125rem;
     font-weight: 600;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--color-ink);
-    margin-bottom: 0.375rem;
+    margin-bottom: 0.5rem;
   }
 
   .field-hint {
-    font-size: 0.8125rem;
+    font-size: 0.9375rem;
     color: var(--color-ink-faint);
-    margin-top: 0.375rem;
+    margin-top: 0.5rem;
   }
 
   .input {
     width: 100%;
-    min-height: 44px;
-    padding: 0.625rem 0.8125rem;
+    min-height: 52px;
+    padding: 0.8125rem 1rem;
     background: var(--color-paper-raised);
-    border: 1px solid var(--color-rule-strong);
-    border-radius: 10px;
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-card);
     color: var(--color-ink);
-    font-size: 0.9375rem;
+    font-size: 1.0625rem;
     font-family: inherit;
   }
 
@@ -183,30 +258,54 @@
   }
 
   .input:focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 3px solid var(--color-accent);
     outline-offset: 1px;
-    border-color: var(--color-accent);
   }
 
   .badge {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    padding: 0.1875rem 0.5rem;
+    padding: 0.3125rem 0.75rem;
+    border: 2px solid currentColor;
     border-radius: 999px;
+    font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     white-space: nowrap;
+  }
+
+  .badge-solid {
+    border-color: transparent;
+    color: #ffffff;
   }
 
   .prose-body {
     color: var(--color-ink-soft);
+    font-size: 1.0625rem;
     line-height: 1.65;
   }
 
   .prose-body p + p {
-    margin-top: 0.75rem;
+    margin-top: 0.875rem;
+  }
+
+  /* The vote count, set as a printed numeral rather than a chip. It is the
+     central gesture of the whole platform, so it is the largest thing on a card. */
+  .tally {
+    font-family: var(--font-display);
+    font-size: 3.25rem;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    color: var(--color-accent);
+  }
+
+  .rule-heavy {
+    height: 3px;
+    background: var(--color-ink);
+    border: 0;
   }
 }
 
@@ -217,7 +316,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -226,7 +325,7 @@
 }
 
 .animate-rise {
-  animation: rise 320ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation: rise 340ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {

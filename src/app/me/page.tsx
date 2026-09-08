@@ -78,17 +78,17 @@ function MySpace() {
   }, [load]);
 
   if (!data) {
-    return <p className="mx-auto max-w-4xl px-4 py-20 text-sm text-ink-faint sm:px-6">{t("common.loading")}</p>;
+    return <p className="mx-auto max-w-4xl px-4 py-24 text-ink-faint sm:px-6">{t("common.loading")}</p>;
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6">
       <h1 className="text-3xl">{t("me.title")}</h1>
 
       <section className="mt-10">
         <h2 className="text-xl">{t("me.myClaims")}</h2>
         {data.claims.length === 0 ? (
-          <p className="surface mt-4 p-6 text-sm text-ink-faint">{t("me.noClaims")}</p>
+          <p className="surface mt-4 p-7 text-ink-faint">{t("me.noClaims")}</p>
         ) : (
           <div className="mt-4 flex flex-col gap-4">
             {data.claims.map((claim) => (
@@ -107,7 +107,7 @@ function MySpace() {
       <section className="mt-12">
         <h2 className="text-xl">{t("me.myIdeas")}</h2>
         {data.ideas.length === 0 ? (
-          <p className="surface mt-4 p-6 text-sm text-ink-faint">{t("me.noIdeas")}</p>
+          <p className="surface mt-4 p-7 text-ink-faint">{t("me.noIdeas")}</p>
         ) : (
           <ul className="mt-4 flex flex-col gap-2">
             {data.ideas.map((idea) => (
@@ -116,7 +116,7 @@ function MySpace() {
                 <Link href={`/idea/?id=${idea.id}`} className="flex-1 hover:text-accent-ink">
                   {idea.title}
                 </Link>
-                <span className="text-sm text-ink-faint">
+                <span className="text-ink-faint">
                   {t.plural("ideas.voteCount", "ideas.voteCountPlural", idea.vote_count)}
                 </span>
               </li>
@@ -128,7 +128,7 @@ function MySpace() {
       <section className="mt-12">
         <h2 className="text-xl">{t("me.myProjects")}</h2>
         {data.projects.length === 0 ? (
-          <p className="surface mt-4 p-6 text-sm text-ink-faint">{t("me.noProjects")}</p>
+          <p className="surface mt-4 p-7 text-ink-faint">{t("me.noProjects")}</p>
         ) : (
           <ul className="mt-4 flex flex-col gap-2">
             {data.projects.map((project) => (
@@ -141,7 +141,7 @@ function MySpace() {
                 >
                   {project.url}
                 </a>
-                <span className="text-sm text-ink-faint">
+                <span className="text-ink-faint">
                   {formatDate(project.published_at, locale)}
                 </span>
               </li>
