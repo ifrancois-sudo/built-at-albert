@@ -16,7 +16,7 @@
     // Public, non-secret values only. Secrets go through `wrangler secret put`.
     "NEXT_PUBLIC_SUPABASE_URL": "https://sdrlrksfefswxtmnjfmx.supabase.co",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_qYE6EfbXOAF6PNArlxXZ7A__F1theHf",
-    "NEXT_PUBLIC_SITE_URL": "https://built-at-albert.workers.dev",
+    "NEXT_PUBLIC_SITE_URL": "https://built-at-albert.indyfrancois6.workers.dev",
     "ALLOWED_EMAIL_DOMAINS": "albertschool.com",
     "WHATSAPP_CHANNEL_URL": "https://whatsapp.com/channel/0029Vb99R1UFXUuTnGJblY2H"
   }

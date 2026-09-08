@@ -12,8 +12,11 @@
       "0 8 * * 1"
     ]
   },
+  // No fetch handler and nothing to serve: keep it off the public internet.
+  "workers_dev": false,
+  "preview_urls": false,
   "vars": {
-    "APP_URL": "https://built-at-albert.workers.dev"
+    "APP_URL": "https://built-at-albert.indyfrancois6.workers.dev"
   },
   "observability": {
     "enabled": true
