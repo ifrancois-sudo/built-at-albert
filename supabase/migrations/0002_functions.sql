@@ -354,6 +354,7 @@ begin
 end;
 $$;
 
--- Only the service role runs the cron functions.
-revoke execute on function public.expire_due_claims() from anon, authenticated;
-revoke execute on function public.claim_reminders_due() from anon, authenticated;
+-- Only the service role runs the cron functions. Revoking from PUBLIC is the
+-- part that matters; see 0006_function_privileges.sql.
+revoke execute on function public.expire_due_claims() from public, anon, authenticated;
+revoke execute on function public.claim_reminders_due() from public, anon, authenticated;

@@ -11,7 +11,9 @@
     "cf:build": "opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "verify:rules": "node scripts/verify-rules.mjs",
+    "db:push": "node scripts/db-push-api.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

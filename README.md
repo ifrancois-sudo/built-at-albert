@@ -45,9 +45,14 @@ Migrations are versioned in `supabase/migrations/` and applied in order. They
 are the only way the schema changes; nothing is edited by hand in the Supabase
 dashboard.
 
+The project's direct Postgres host is IPv6-only and the pooler URI needs a
+password that is shown once at project creation, so the runner goes through the
+Supabase Management API instead, the same way the dashboard SQL editor does.
+Create a token at https://supabase.com/dashboard/account/tokens.
+
 ```bash
-supabase link --project-ref <ref>
-supabase db push
+SUPABASE_ACCESS_TOKEN=sbp_... npm run db:push          # migrations
+SUPABASE_ACCESS_TOKEN=sbp_... node scripts/db-push-api.mjs --seed   # + launch content
 ```
 
 What they set up:
@@ -63,6 +68,22 @@ What they set up:
   named after the uploader's id.
 - `0005_email_allowlist.sql` — the trigger on `auth.users` that refuses an
   address outside the school domain.
+- `0006_function_privileges.sql` — revokes EXECUTE from PUBLIC and hands each
+  function back deliberately. Revoking from `anon` and `authenticated` alone
+  does nothing, because Postgres grants new functions to PUBLIC.
+
+## Checking the rules hold
+
+```bash
+SUPABASE_SERVICE_ROLE_KEY=... npm run verify:rules
+```
+
+It attacks the REST and auth APIs directly with the public anon key rather than
+going through the application, and covers all of it: the domain allowlist, the
+unverified account seeing nothing, moderation before publication, two
+simultaneous claims on one idea, the third claim refused, self-voting, role
+escalation, reading someone else's email, running the cron functions as a
+student, and the cron being safe to run twice.
 
 ## Deployment
 

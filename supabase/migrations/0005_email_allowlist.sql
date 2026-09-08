@@ -21,15 +21,20 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  domain text;
+  -- Not named `domain`: that collides with allowed_email_domains.domain and
+  -- plpgsql rejects the ambiguous reference, which silently refuses every
+  -- address including the valid ones.
+  email_domain text;
 begin
-  domain := lower(split_part(coalesce(new.email, ''), '@', 2));
+  email_domain := lower(split_part(coalesce(new.email, ''), '@', 2));
 
-  if domain = '' then
+  if email_domain = '' then
     raise exception 'email_domain_not_allowed' using errcode = 'check_violation';
   end if;
 
-  if not exists (select 1 from public.allowed_email_domains d where d.domain = domain) then
+  if not exists (
+    select 1 from public.allowed_email_domains d where d.domain = email_domain
+  ) then
     raise exception 'email_domain_not_allowed' using errcode = 'check_violation';
   end if;
 
