@@ -1,15 +1,20 @@
+"use client";
+
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getTranslator } from "@/i18n/server";
-import { getViewer } from "@/lib/auth";
-import { allowedEmailDomains } from "@/lib/env";
-import { CLAIM_DAYS } from "@/lib/public-config";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useSession } from "@/lib/session";
+import { useT } from "@/i18n/provider";
+import { ALLOWED_EMAIL_DOMAINS, CLAIM_DAYS } from "@/lib/public-config";
 
-export default async function LandingPage() {
-  const viewer = await getViewer();
-  if (viewer) redirect("/ideas");
+export default function LandingPage() {
+  const t = useT();
+  const router = useRouter();
+  const { verified } = useSession();
 
-  const t = await getTranslator();
+  useEffect(() => {
+    if (verified) router.replace("/ideas/");
+  }, [verified, router]);
 
   const steps = [
     { title: t("landing.step1Title"), body: t("landing.step1Body") },
@@ -29,20 +34,20 @@ export default async function LandingPage() {
           <p className="prose-body mt-5 max-w-xl text-lg">{t("landing.subtitle")}</p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link href="/signup" className="btn btn-primary">
+            <Link href="/signup/" className="btn btn-primary">
               {t("landing.ctaPrimary")}
             </Link>
-            <Link href="/login" className="btn btn-secondary">
+            <Link href="/login/" className="btn btn-secondary">
               {t("landing.ctaSecondary")}
             </Link>
           </div>
           <p className="mt-3 text-sm text-ink-faint">
-            {t("landing.restricted")} {allowedEmailDomains().join(", ")}
+            {t("landing.restricted")} {ALLOWED_EMAIL_DOMAINS.join(", ")}
           </p>
         </div>
 
-        {/* The countdown is the rule that keeps the platform from silting up,
-            so it is stated on the very first screen rather than buried. */}
+        {/* The countdown is the rule that keeps the board from silting up, so it
+            is stated on the very first screen rather than buried. */}
         <aside className="surface p-6 lg:mb-2">
           <p className="font-display text-6xl leading-none text-accent">{CLAIM_DAYS}</p>
           <p className="mt-3 text-sm font-semibold">{t("claim.rulesTitle")}</p>

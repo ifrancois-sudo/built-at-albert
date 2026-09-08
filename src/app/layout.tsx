@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
-import { getLocale } from "@/i18n/server";
+import { DEFAULT_LOCALE } from "@/i18n";
 import { LocaleProvider } from "@/i18n/provider";
+import { SessionProvider } from "@/lib/session";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SITE_URL } from "@/lib/public-config";
@@ -31,25 +32,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={locale} className={`${sans.variable} ${display.variable}`}>
+    // The page is built once as a static file, so the language attribute starts
+    // at the default and LocaleProvider corrects it on mount.
+    <html lang={DEFAULT_LOCALE} className={`${sans.variable} ${display.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <LocaleProvider locale={locale}>
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-paper-raised focus:px-4 focus:py-2 focus:shadow"
-          >
-            {locale === "fr" ? "Aller au contenu" : "Skip to content"}
-          </a>
-          <SiteHeader />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
-        </LocaleProvider>
+        <SessionProvider>
+          <LocaleProvider>
+            <a
+              href="#main"
+              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-paper-raised focus:px-4 focus:py-2 focus:shadow"
+            >
+              Aller au contenu / Skip to content
+            </a>
+            <SiteHeader />
+            <main id="main" className="flex-1">
+              {children}
+            </main>
+            <SiteFooter />
+          </LocaleProvider>
+        </SessionProvider>
       </body>
     </html>
   );

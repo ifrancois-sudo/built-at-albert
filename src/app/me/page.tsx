@@ -1,52 +1,85 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
-import { requireViewer } from "@/lib/auth";
-import { createServerSupabase } from "@/lib/supabase/server";
-import { getLocale, getTranslator } from "@/i18n/server";
-import { formatDate } from "@/lib/format";
+import { useCallback, useEffect, useState } from "react";
+import { useSession } from "@/lib/session";
+import { useLocale, useT } from "@/i18n/provider";
+import { RequireSession } from "@/components/require-session";
 import { StatusBadge } from "@/components/status-badge";
-import { ClaimTracker } from "./claim-tracker";
+import { ClaimTracker } from "@/app/me/claim-tracker";
+import { supabase } from "@/lib/supabase/client";
+import { listMyActiveClaims } from "@/lib/api/claims";
+import { formatDate } from "@/lib/format";
+import type { ClaimRow, IdeaRow, ProjectRow } from "@/lib/database.types";
 
-export const metadata: Metadata = { title: "Mon espace" };
-
-export default async function MySpacePage() {
-  const viewer = await requireViewer();
-  const [t, locale] = await Promise.all([getTranslator(), getLocale()]);
-  const supabase = await createServerSupabase();
-
-  const [ideasResult, claimsResult, projectsResult] = await Promise.all([
-    supabase
-      .from("ideas")
-      .select("*")
-      .eq("author_id", viewer.id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("claims")
-      .select("*")
-      .eq("user_id", viewer.id)
-      .eq("status", "active")
-      .order("expires_at", { ascending: true }),
-    supabase
-      .from("projects")
-      .select("*")
-      .eq("author_id", viewer.id)
-      .order("published_at", { ascending: false }),
-  ]);
-
-  const claims = claimsResult.data ?? [];
-  const claimIdeas = new Map(
-    claims.length > 0
-      ? (
-          await supabase
-            .from("ideas")
-            .select("id, title")
-            .in(
-              "id",
-              claims.map((claim) => claim.idea_id),
-            )
-        ).data?.map((idea) => [idea.id, idea.title]) ?? []
-      : [],
+export default function MySpacePage() {
+  return (
+    <RequireSession>
+      <MySpace />
+    </RequireSession>
   );
+}
+
+function MySpace() {
+  const t = useT();
+  const { locale } = useLocale();
+  const { user } = useSession();
+  const userId = user?.id ?? "";
+
+  // Loaded as one bundle so the page never renders half a state: claims from
+  // this fetch next to projects from the previous one.
+  interface Snapshot {
+    claims: ClaimRow[];
+    claimTitles: Map<string, string>;
+    ideas: IdeaRow[];
+    projects: ProjectRow[];
+  }
+
+  const [data, setData] = useState<Snapshot | null>(null);
+
+  const load = useCallback(async (): Promise<Snapshot> => {
+    const [claimResult, ideaResult, projectResult] = await Promise.all([
+      listMyActiveClaims(userId),
+      supabase().from("ideas").select("*").eq("author_id", userId).order("created_at", { ascending: false }),
+      supabase().from("projects").select("*").eq("author_id", userId).order("published_at", { ascending: false }),
+    ]);
+
+    const activeClaims = claimResult.data ?? [];
+    let claimTitles = new Map<string, string>();
+
+    if (activeClaims.length > 0) {
+      const { data: titles } = await supabase()
+        .from("ideas")
+        .select("id, title")
+        .in("id", activeClaims.map((claim) => claim.idea_id));
+      claimTitles = new Map((titles ?? []).map((idea) => [idea.id, idea.title]));
+    }
+
+    return {
+      claims: activeClaims,
+      claimTitles,
+      ideas: ideaResult.data ?? [],
+      projects: projectResult.data ?? [],
+    };
+  }, [userId]);
+
+  const refresh = useCallback(async () => {
+    setData(await load());
+  }, [load]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void load().then((next) => {
+      if (!cancelled) setData(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [load]);
+
+  if (!data) {
+    return <p className="mx-auto max-w-4xl px-4 py-20 text-sm text-ink-faint sm:px-6">{t("common.loading")}</p>;
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
@@ -54,18 +87,17 @@ export default async function MySpacePage() {
 
       <section className="mt-10">
         <h2 className="text-xl">{t("me.myClaims")}</h2>
-        {claims.length === 0 ? (
+        {data.claims.length === 0 ? (
           <p className="surface mt-4 p-6 text-sm text-ink-faint">{t("me.noClaims")}</p>
         ) : (
           <div className="mt-4 flex flex-col gap-4">
-            {claims.map((claim) => (
+            {data.claims.map((claim) => (
               <ClaimTracker
                 key={claim.id}
-                claimId={claim.id}
-                ideaId={claim.idea_id}
-                ideaTitle={claimIdeas.get(claim.idea_id) ?? "—"}
-                expiresAt={claim.expires_at}
-                expiresLabel={formatDate(claim.expires_at, locale)}
+                claim={claim}
+                ideaTitle={data.claimTitles.get(claim.idea_id) ?? "—"}
+                userId={userId}
+                onChanged={refresh}
               />
             ))}
           </div>
@@ -74,14 +106,14 @@ export default async function MySpacePage() {
 
       <section className="mt-12">
         <h2 className="text-xl">{t("me.myIdeas")}</h2>
-        {(ideasResult.data ?? []).length === 0 ? (
+        {data.ideas.length === 0 ? (
           <p className="surface mt-4 p-6 text-sm text-ink-faint">{t("me.noIdeas")}</p>
         ) : (
           <ul className="mt-4 flex flex-col gap-2">
-            {(ideasResult.data ?? []).map((idea) => (
+            {data.ideas.map((idea) => (
               <li key={idea.id} className="surface flex flex-wrap items-center gap-3 p-4">
-                <StatusBadge status={idea.status} t={t} />
-                <Link href={`/ideas/${idea.id}`} className="flex-1 hover:text-accent-ink">
+                <StatusBadge status={idea.status} />
+                <Link href={`/idea/?id=${idea.id}`} className="flex-1 hover:text-accent-ink">
                   {idea.title}
                 </Link>
                 <span className="text-sm text-ink-faint">
@@ -95,17 +127,17 @@ export default async function MySpacePage() {
 
       <section className="mt-12">
         <h2 className="text-xl">{t("me.myProjects")}</h2>
-        {(projectsResult.data ?? []).length === 0 ? (
+        {data.projects.length === 0 ? (
           <p className="surface mt-4 p-6 text-sm text-ink-faint">{t("me.noProjects")}</p>
         ) : (
           <ul className="mt-4 flex flex-col gap-2">
-            {(projectsResult.data ?? []).map((project) => (
+            {data.projects.map((project) => (
               <li key={project.id} className="surface flex flex-wrap items-center gap-3 p-4">
                 <a
                   href={project.url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="flex-1 underline underline-offset-4 hover:text-accent-ink"
+                  className="flex-1 truncate underline underline-offset-4 hover:text-accent-ink"
                 >
                   {project.url}
                 </a>

@@ -1,50 +1,65 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
-import { requireViewer } from "@/lib/auth";
-import { createServerSupabase } from "@/lib/supabase/server";
-import { getTranslator } from "@/i18n/server";
-import { fetchProfiles, displayName } from "@/lib/data/profiles";
+import { useEffect, useState } from "react";
+import { useT } from "@/i18n/provider";
+import { RequireSession } from "@/components/require-session";
+import { listPublicProjects } from "@/lib/api/projects";
+import { displayName, fetchProfiles, type ProfileMap } from "@/lib/api/profiles";
+import { supabase } from "@/lib/supabase/client";
+import type { ProjectRow } from "@/lib/database.types";
 
-export const metadata: Metadata = { title: "Outils livrés" };
+export default function ProjectsPage() {
+  return (
+    <RequireSession>
+      <Gallery />
+    </RequireSession>
+  );
+}
 
-export default async function ProjectsPage() {
-  await requireViewer();
-  const t = await getTranslator();
-  const supabase = await createServerSupabase();
+function Gallery() {
+  const t = useT();
+  const [projects, setProjects] = useState<ProjectRow[] | null>(null);
+  const [authors, setAuthors] = useState<ProfileMap>(new Map());
+  const [titles, setTitles] = useState<Map<string, string>>(new Map());
 
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("is_public", true)
-    .order("published_at", { ascending: false });
+  useEffect(() => {
+    async function load() {
+      const rows = await listPublicProjects();
+      setProjects(rows);
+      if (rows.length === 0) return;
 
-  const rows = projects ?? [];
-  const [authors, ideasResult] = await Promise.all([
-    fetchProfiles(supabase, rows.map((project) => project.author_id)),
-    rows.length > 0
-      ? supabase
+      const [profileMap, ideas] = await Promise.all([
+        fetchProfiles(rows.map((project) => project.author_id)),
+        supabase()
           .from("ideas")
           .select("id, title")
-          .in("id", rows.map((project) => project.idea_id))
-      : Promise.resolve({ data: [] as { id: string; title: string }[] }),
-  ]);
+          .in("id", rows.map((project) => project.idea_id)),
+      ]);
 
-  const ideaTitles = new Map((ideasResult.data ?? []).map((idea) => [idea.id, idea.title]));
+      setAuthors(profileMap);
+      setTitles(new Map((ideas.data ?? []).map((idea) => [idea.id, idea.title])));
+    }
+
+    void load();
+  }, []);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
       <h1 className="text-3xl">{t("gallery.title")}</h1>
       <p className="prose-body mt-1.5 text-sm">{t("gallery.subtitle")}</p>
 
-      {rows.length === 0 ? (
+      {projects === null ? (
+        <p className="mt-8 text-sm text-ink-faint">{t("common.loading")}</p>
+      ) : projects.length === 0 ? (
         <p className="surface mt-8 p-8 text-center text-sm text-ink-faint">{t("gallery.empty")}</p>
       ) : (
         <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {rows.map((project) => (
+          {projects.map((project) => (
             <li key={project.id} className="surface flex flex-col overflow-hidden">
               {project.screenshots[0] ? (
-                // Storage serves these already sized; Next's optimizer does not
-                // run on Workers, so a plain img is the honest choice here.
+                // Storage serves these already sized, and the static export has
+                // no image optimiser, so a plain img is the honest choice.
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={project.screenshots[0]}
@@ -56,15 +71,13 @@ export default async function ProjectsPage() {
 
               <div className="flex flex-1 flex-col p-5">
                 <h2 className="text-lg leading-snug">
-                  <Link href={`/ideas/${project.idea_id}`} className="hover:text-accent-ink">
-                    {ideaTitles.get(project.idea_id) ?? "—"}
+                  <Link href={`/idea/?id=${project.idea_id}`} className="hover:text-accent-ink">
+                    {titles.get(project.idea_id) ?? "—"}
                   </Link>
                 </h2>
                 <p className="prose-body mt-2 line-clamp-3 flex-1 text-sm">{project.description}</p>
                 <p className="mt-3 text-xs text-ink-faint">
-                  {t("ideas.byAuthor", {
-                    name: displayName(authors.get(project.author_id), "—"),
-                  })}
+                  {t("ideas.byAuthor", { name: displayName(authors.get(project.author_id), "—") })}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a

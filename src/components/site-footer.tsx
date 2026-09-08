@@ -1,9 +1,10 @@
-import { getLocale } from "@/i18n/server";
-import { createTranslator } from "@/i18n";
+"use client";
+
+import { useT } from "@/i18n/provider";
 import { WHATSAPP_CHANNEL_URL } from "@/lib/public-config";
 
-export async function SiteFooter() {
-  const t = createTranslator(await getLocale());
+export function SiteFooter() {
+  const t = useT();
 
   return (
     <footer className="mt-20 border-t border-rule">

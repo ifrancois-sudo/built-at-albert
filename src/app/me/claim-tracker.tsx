@@ -1,73 +1,69 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
-import { extendClaimAction, releaseClaimAction } from "@/app/actions/ideas";
-import { IDLE_STATE } from "@/lib/action-state";
-import { useT } from "@/i18n/provider";
+import { useState } from "react";
+import { useLocale, useT } from "@/i18n/provider";
 import { FormMessage } from "@/components/form-message";
+import { DeliveryForm } from "@/app/me/delivery-form";
+import { extendClaim, releaseClaim } from "@/lib/api/claims";
+import { errorMessageKey } from "@/lib/errors";
+import { daysUntil, formatDate } from "@/lib/format";
 import { CLAIM_EXTENSION_DAYS } from "@/lib/public-config";
-import { daysUntil } from "@/lib/format";
-import { DeliveryForm } from "./delivery-form";
+import type { ClaimRow } from "@/lib/database.types";
+import type { MessageKey } from "@/i18n";
 
 export function ClaimTracker({
-  claimId,
-  ideaId,
+  claim,
   ideaTitle,
-  expiresAt,
-  expiresLabel,
+  userId,
+  onChanged,
 }: {
-  claimId: string;
-  ideaId: string;
+  claim: ClaimRow;
   ideaTitle: string;
-  expiresAt: string;
-  expiresLabel: string;
+  userId: string;
+  onChanged: () => Promise<void>;
 }) {
   const t = useT();
-  const [extendState, extendAction, extendPending] = useActionState(extendClaimAction, IDLE_STATE);
-  const [releaseState, releaseAction, releasePending] = useActionState(releaseClaimAction, IDLE_STATE);
+  const { locale } = useLocale();
+  const [pending, setPending] = useState(false);
+  const [message, setMessage] = useState<{ tone: "error" | "success"; key: MessageKey } | null>(null);
   const [delivering, setDelivering] = useState(false);
 
-  const left = daysUntil(expiresAt);
-  // Under a week left, the countdown switches to the signal colour. That is the
-  // only place amber is used, so it reads as a deadline rather than decoration.
+  const left = daysUntil(claim.expires_at);
+  // Under a week left, the countdown turns amber. That is the only place the
+  // colour is used, so it reads as a deadline rather than decoration.
   const urgent = left <= 7;
+
+  async function run(action: () => Promise<{ error: unknown }>, successKey: MessageKey) {
+    setPending(true);
+    setMessage(null);
+    const { error } = await action();
+    setPending(false);
+
+    if (error) return setMessage({ tone: "error", key: errorMessageKey(error) });
+    setMessage({ tone: "success", key: successKey });
+    await onChanged();
+  }
 
   return (
     <article className="surface p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <Link href={`/ideas/${ideaId}`} className="text-lg hover:text-accent-ink">
+          <Link href={`/idea/?id=${claim.idea_id}`} className="text-lg hover:text-accent-ink">
             {ideaTitle}
           </Link>
           <p className="mt-1 text-sm text-ink-faint">
-            {t("ideas.claimedUntil", { date: expiresLabel })}
+            {t("ideas.claimedUntil", { date: formatDate(claim.expires_at, locale) })}
           </p>
         </div>
-        <span
-          className={`badge ${urgent ? "bg-signal-soft text-signal" : "bg-accent-soft text-accent-ink"}`}
-        >
-          {left === 0
-            ? t("claim.expiresToday")
-            : t.plural("claim.daysLeft", "claim.daysLeftPlural", left)}
+        <span className={`badge ${urgent ? "bg-signal-soft text-signal" : "bg-accent-soft text-accent-ink"}`}>
+          {left === 0 ? t("claim.expiresToday") : t.plural("claim.daysLeft", "claim.daysLeftPlural", left)}
         </span>
       </div>
 
-      {extendState.status !== "idle" && extendState.messageKey ? (
+      {message ? (
         <div className="mt-4">
-          <FormMessage
-            tone={extendState.status === "error" ? "error" : "success"}
-            messageKey={extendState.messageKey}
-            params={extendState.params}
-          />
-        </div>
-      ) : null}
-      {releaseState.status !== "idle" && releaseState.messageKey ? (
-        <div className="mt-4">
-          <FormMessage
-            tone={releaseState.status === "error" ? "error" : "success"}
-            messageKey={releaseState.messageKey}
-          />
+          <FormMessage tone={message.tone} messageKey={message.key} />
         </div>
       ) : null}
 
@@ -75,28 +71,32 @@ export function ClaimTracker({
         <button
           type="button"
           className="btn btn-primary h-10 min-h-0"
-          onClick={() => setDelivering((open) => !open)}
           aria-expanded={delivering}
+          onClick={() => setDelivering((open) => !open)}
         >
           {t("claim.deliverCta")}
         </button>
-
-        <form action={extendAction}>
-          <input type="hidden" name="claim_id" value={claimId} />
-          <button type="submit" className="btn btn-secondary h-10 min-h-0" disabled={extendPending}>
-            {t("claim.extend", { extension: CLAIM_EXTENSION_DAYS })}
-          </button>
-        </form>
-
-        <form action={releaseAction}>
-          <input type="hidden" name="claim_id" value={claimId} />
-          <button type="submit" className="btn btn-danger h-10 min-h-0" disabled={releasePending}>
-            {t("claim.release")}
-          </button>
-        </form>
+        <button
+          type="button"
+          className="btn btn-secondary h-10 min-h-0"
+          disabled={pending}
+          onClick={() => run(() => extendClaim(claim.id), "claim.extended")}
+        >
+          {t("claim.extend", { extension: CLAIM_EXTENSION_DAYS })}
+        </button>
+        <button
+          type="button"
+          className="btn btn-danger h-10 min-h-0"
+          disabled={pending}
+          onClick={() => run(() => releaseClaim(claim.id), "claim.released")}
+        >
+          {t("claim.release")}
+        </button>
       </div>
 
-      {delivering ? <DeliveryForm claimId={claimId} /> : null}
+      {delivering ? (
+        <DeliveryForm claimId={claim.id} userId={userId} onDelivered={onChanged} />
+      ) : null}
     </article>
   );
 }

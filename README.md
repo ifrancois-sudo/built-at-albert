@@ -6,53 +6,55 @@ card pointing at the live tool.
 
 The platform hosts no student project. It stores a card and a link.
 
+Live at **https://built-at-albert.pages.dev**
+
 ## Stack
 
 | Piece | Choice |
 | --- | --- |
-| App | Next.js 16 (App Router, TypeScript) |
-| Runtime | Cloudflare Workers via `@opennextjs/cloudflare` |
+| App | Next.js 16, static export (`output: "export"`) |
+| Hosting | Cloudflare Pages |
+| Server work | Cloudflare Pages Functions in `functions/api/*` |
+| Scheduled work | A separate Worker in `worker-cron/` |
 | Data, auth, files | Supabase (Postgres, Auth, Storage, RLS) |
 | Transactional email | Resend |
 | Styling | Tailwind CSS v4, no component library |
 
-Two rules the runtime depends on. `nodejs_compat` must stay in
-`wrangler.jsonc`, or the Supabase client fails at runtime with an opaque error.
-No page or route handler may declare `export const runtime`; the adapter picks
-the runtime itself and rejects the override.
+The browser talks to Supabase directly with the publishable key. That key is
+public by design, so **row level security is the security boundary**, not the
+interface. Every rule is enforced in Postgres and verified against the API
+directly; see "Checking the rules hold" below.
+
+Only three things need a secret, and all three live in Pages Functions: sending
+email, reading anyone's address, and running the scheduled jobs.
 
 ## Local setup
 
 ```bash
 npm install
-cp .dev.vars.example .dev.vars   # then fill in the secrets
 npm run dev
 ```
 
-`.dev.vars` holds the server-only secrets and is git-ignored. The Supabase
-project URL and publishable key are public by design and live in
-`src/lib/public-config.ts` and `wrangler.jsonc`.
-
-To exercise the real Workers runtime rather than `next dev`:
+To run the Functions too, which needs `.dev.vars` filled in from
+`.dev.vars.example`:
 
 ```bash
-npm run preview
+npm run dev:functions
 ```
 
 ## Database
 
 Migrations are versioned in `supabase/migrations/` and applied in order. They
-are the only way the schema changes; nothing is edited by hand in the Supabase
-dashboard.
+are the only way the schema changes; nothing is edited by hand in the dashboard.
 
 The project's direct Postgres host is IPv6-only and the pooler URI needs a
-password that is shown once at project creation, so the runner goes through the
-Supabase Management API instead, the same way the dashboard SQL editor does.
-Create a token at https://supabase.com/dashboard/account/tokens.
+password shown once at project creation, so the runner goes through the Supabase
+Management API, the same way the dashboard SQL editor does. Create a token at
+https://supabase.com/dashboard/account/tokens.
 
 ```bash
-SUPABASE_ACCESS_TOKEN=sbp_... npm run db:push          # migrations
-SUPABASE_ACCESS_TOKEN=sbp_... node scripts/db-push-api.mjs --seed   # + launch content
+SUPABASE_ACCESS_TOKEN=sbp_... npm run db:push
+SUPABASE_ACCESS_TOKEN=sbp_... node scripts/db-push-api.mjs --seed
 ```
 
 What they set up:
@@ -72,46 +74,51 @@ What they set up:
   function back deliberately. Revoking from `anon` and `authenticated` alone
   does nothing, because Postgres grants new functions to PUBLIC.
 
+The seed needs the admin account to exist first; it authors the launch ideas.
+
 ## Checking the rules hold
 
 ```bash
 SUPABASE_SERVICE_ROLE_KEY=... npm run verify:rules
 ```
 
-It attacks the REST and auth APIs directly with the public anon key rather than
-going through the application, and covers all of it: the domain allowlist, the
-unverified account seeing nothing, moderation before publication, two
-simultaneous claims on one idea, the third claim refused, self-voting, role
-escalation, reading someone else's email, running the cron functions as a
-student, and the cron being safe to run twice.
+It attacks the REST and auth APIs directly with the public key rather than going
+through the interface, and covers the domain allowlist, an unverified account
+seeing nothing, moderation before publication, two simultaneous claims on one
+idea, the third claim refused, self-voting, role escalation, reading someone
+else's email, running the cron functions as a student, and the cron being safe
+to run twice.
 
 ## Deployment
 
 ```bash
-npm run deploy
-npx wrangler deploy --config worker-cron/wrangler.jsonc
+npm run deploy        # build + Cloudflare Pages
+npm run deploy:cron   # the scheduled Worker
 ```
 
-Secrets are set with `wrangler secret put`, never committed:
+Secrets are set with wrangler, never committed:
 
 ```bash
-npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-npx wrangler secret put RESEND_API_KEY
-npx wrangler secret put RESEND_FROM
-npx wrangler secret put CRON_SECRET
+npx wrangler pages secret put SUPABASE_URL --project-name built-at-albert
+npx wrangler pages secret put SUPABASE_SERVICE_ROLE_KEY --project-name built-at-albert
+npx wrangler pages secret put SITE_URL --project-name built-at-albert
+npx wrangler pages secret put CRON_SECRET --project-name built-at-albert
+npx wrangler pages secret put RESEND_API_KEY --project-name built-at-albert
+npx wrangler pages secret put RESEND_FROM --project-name built-at-albert
+
 npx wrangler secret put CRON_SECRET --config worker-cron/wrangler.jsonc
 ```
 
-`CRON_SECRET` must match on both Workers. See `worker-cron/README.md` for the
-schedule and how to trigger a run by hand.
+`CRON_SECRET` must match on the Pages project and the cron Worker.
 
 ### Supabase settings that are not in migrations
 
-- Auth > SMTP: point it at Resend, sender on the project domain, reply-to the
-  administrator. The built-in sender is rate-limited and meant for development.
-- Auth > URL configuration: site URL plus `/auth/callback` as a redirect.
+- Auth > SMTP: point it at Resend, sender on a domain you control, reply-to the
+  administrator. The built-in sender only reaches project team members, so
+  without this no student can confirm their address.
+- Auth > URL configuration: site URL plus `/auth/callback/` as a redirect.
 - Auth > Email templates: `{{ .TokenHash }}` links are handled by the callback
-  route alongside the default `code` links, so either template style works.
+  page alongside the default `code` links, so either template style works.
 
 ## The rule that keeps this alive
 

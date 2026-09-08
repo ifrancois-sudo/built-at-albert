@@ -1,57 +1,56 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
-import { toggleVoteAction } from "@/app/actions/ideas";
+import { useState, useTransition } from "react";
+import { toggleVote } from "@/lib/api/ideas";
 import { useT } from "@/i18n/provider";
 
 export function VoteButton({
   ideaId,
+  userId,
   count,
   hasVoted,
   isOwn,
 }: {
   ideaId: string;
+  userId: string;
   count: number;
   hasVoted: boolean;
   isOwn: boolean;
 }) {
   const t = useT();
-  const [, startTransition] = useTransition();
-
-  // Optimistic so the count moves the instant it is clicked; the server action
-  // revalidates and the real number lands a moment later.
-  const [optimistic, setOptimistic] = useOptimistic(
-    { count, hasVoted },
-    (state) => ({
-      count: state.hasVoted ? state.count - 1 : state.count + 1,
-      hasVoted: !state.hasVoted,
-    }),
-  );
+  const [state, setState] = useState({ count, hasVoted });
+  const [pending, startTransition] = useTransition();
 
   if (isOwn) {
     return (
       <span className="badge bg-paper-sunk text-ink-faint" title={t("ideas.voteOwn")}>
-        {t.plural("ideas.voteCount", "ideas.voteCountPlural", count)}
+        {t.plural("ideas.voteCount", "ideas.voteCountPlural", state.count)}
       </span>
     );
+  }
+
+  function onClick() {
+    // Move the count immediately, then put it back if the write is refused.
+    const previous = state;
+    const next = { count: state.hasVoted ? state.count - 1 : state.count + 1, hasVoted: !state.hasVoted };
+    setState(next);
+
+    startTransition(async () => {
+      const { error } = await toggleVote(ideaId, userId, previous.hasVoted);
+      if (error) setState(previous);
+    });
   }
 
   return (
     <button
       type="button"
-      aria-pressed={optimistic.hasVoted}
-      className={`btn h-9 min-h-0 px-3 text-sm ${
-        optimistic.hasVoted ? "btn-primary" : "btn-secondary"
-      }`}
-      onClick={() =>
-        startTransition(async () => {
-          setOptimistic(null);
-          await toggleVoteAction(ideaId, optimistic.hasVoted);
-        })
-      }
+      aria-pressed={state.hasVoted}
+      disabled={pending}
+      className={`btn h-9 min-h-0 px-3 text-sm ${state.hasVoted ? "btn-primary" : "btn-secondary"}`}
+      onClick={onClick}
     >
-      <span aria-hidden>{optimistic.hasVoted ? "▲" : "△"}</span>
-      <span>{t.plural("ideas.voteCount", "ideas.voteCountPlural", optimistic.count)}</span>
+      <span aria-hidden>{state.hasVoted ? "▲" : "△"}</span>
+      <span>{t.plural("ideas.voteCount", "ideas.voteCountPlural", state.count)}</span>
     </button>
   );
 }

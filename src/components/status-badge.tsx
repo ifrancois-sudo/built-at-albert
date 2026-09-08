@@ -1,5 +1,7 @@
+"use client";
+
+import { useT } from "@/i18n/provider";
 import type { IdeaStatus } from "@/lib/database.types";
-import type { Translator } from "@/i18n";
 
 const TONE: Record<IdeaStatus, string> = {
   pending: "bg-paper-sunk text-ink-faint",
@@ -9,6 +11,7 @@ const TONE: Record<IdeaStatus, string> = {
   rejected: "bg-bad-soft text-bad",
 };
 
-export function StatusBadge({ status, t }: { status: IdeaStatus; t: Translator }) {
+export function StatusBadge({ status }: { status: IdeaStatus }) {
+  const t = useT();
   return <span className={`badge ${TONE[status]}`}>{t(`status.${status}`)}</span>;
 }

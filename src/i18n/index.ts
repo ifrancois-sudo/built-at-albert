@@ -4,7 +4,7 @@ import en from "./en.json";
 export const LOCALES = ["fr", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "fr";
-export const LOCALE_COOKIE = "bata_locale";
+export const LOCALE_STORAGE_KEY = "bata_locale";
 
 const DICTIONARIES = { fr, en } as const;
 export type Dictionary = typeof fr;
@@ -27,18 +27,6 @@ export function isLocale(value: unknown): value is Locale {
 
 export function getDictionary(locale: Locale): Dictionary {
   return DICTIONARIES[locale];
-}
-
-// Picks the first supported locale out of an Accept-Language header.
-export function localeFromHeader(header: string | null | undefined): Locale | null {
-  if (!header) return null;
-  for (const part of header.split(",")) {
-    const tag = part.split(";")[0]?.trim().toLowerCase();
-    if (!tag) continue;
-    const base = tag.split("-")[0];
-    if (isLocale(base)) return base;
-  }
-  return null;
 }
 
 function lookup(dictionary: Dictionary, key: string): string | null {

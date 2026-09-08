@@ -7,26 +7,22 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
-    "cf:build": "opennextjs-cloudflare build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-    "verify:rules": "node scripts/verify-rules.mjs",
-    "db:push": "node scripts/db-push-api.mjs"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p functions/tsconfig.json",
+    "dev:functions": "npm run build && wrangler pages dev out --port 8788",
+    "deploy": "npm run build && wrangler pages deploy out --project-name built-at-albert",
+    "deploy:cron": "wrangler deploy --config worker-cron/wrangler.jsonc",
+    "db:push": "node scripts/db-push-api.mjs",
+    "verify:rules": "node scripts/verify-rules.mjs"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "resend": "^6.26.0",
-    "server-only": "^0.0.1"
+    "resend": "^6.26.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260908.1",
-    "@opennextjs/cloudflare": "^1.20.6",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
