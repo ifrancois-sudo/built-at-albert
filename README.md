@@ -73,6 +73,16 @@ What they set up:
 - `0006_function_privileges.sql` — revokes EXECUTE from PUBLIC and hands each
   function back deliberately. Revoking from `anon` and `authenticated` alone
   does nothing, because Postgres grants new functions to PUBLIC.
+- `0007_seedable_ideas.sql` — lets trusted SQL author an idea. The trigger used
+  to overwrite `author_id` with `auth.uid()` unconditionally, which set it to
+  null for anything running outside a session.
+- `0008_account_erasure.sql` — detaches contributions from their author instead
+  of cascading. Erasing an account must not take other students' votes and a
+  working tool down with it.
+- `0009_search.sql` — accent-insensitive full text search plus trigram matching
+  for the duplicate warning.
+- `0010_vote_milestones.sql` — records the highest vote threshold already
+  announced, so an author hears about traction once per threshold.
 
 The seed needs the admin account to exist first; it authors the launch ideas.
 
@@ -128,6 +138,17 @@ returns to `open`, and both the builder and the idea's author are told.
 
 Without that cycle the board fills with frozen ideas and ships nothing. The
 exclusivity is a database constraint, never a client-side check.
+
+## Privacy
+
+`/mentions-legales/` and `/confidentialite/` are public pages, reachable from the
+footer without an account. A member can correct their own details and erase
+their account from `/me/`.
+
+Erasure removes the auth row, the profile and that person's votes. It keeps the
+ideas they wrote and the tools they delivered, detached from any name: taking
+those down would erase votes other students cast and remove a working tool from
+the gallery, which the right to erasure does not require.
 
 ## Not in v1
 

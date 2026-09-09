@@ -114,7 +114,7 @@ function IdeaDetail() {
           isOwn={isAuthor}
         />
         <p className="text-ink-faint">
-          {t("ideas.byAuthor", { name: displayName(author, "—") })} ·{" "}
+          {t("ideas.byAuthor", { name: displayName(author, t("common.deletedAccount")) })} ·{" "}
           {formatDate(idea.created_at, locale)}
         </p>
       </div>

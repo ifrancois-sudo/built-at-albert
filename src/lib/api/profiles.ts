@@ -8,8 +8,12 @@ export type ProfileMap = Map<string, ProfileRow>;
 // Names come from one extra round trip rather than a PostgREST embed. The email
 // column is hidden by a column grant, and a flat lookup keeps the query types
 // honest without hand-maintaining foreign-key metadata.
-export async function fetchProfiles(ids: Iterable<string>): Promise<ProfileMap> {
-  const unique = Array.from(new Set(Array.from(ids).filter(Boolean)));
+export async function fetchProfiles(
+  ids: Iterable<string | null | undefined>,
+): Promise<ProfileMap> {
+  const unique = Array.from(new Set(Array.from(ids))).filter(
+    (id): id is string => Boolean(id),
+  );
   if (unique.length === 0) return new Map();
 
   const { data } = await supabase().from("profiles").select(PROFILE_COLUMNS).in("id", unique);

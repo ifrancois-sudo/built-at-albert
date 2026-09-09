@@ -5,6 +5,7 @@ import {
   claimExpiredForAuthor,
   claimExpiredForBuilder,
   claimReminder,
+  voteMilestone,
 } from "../../_lib/email-templates";
 
 interface ExpiredRow {
@@ -13,6 +14,13 @@ interface ExpiredRow {
   idea_title: string;
   builder_id: string;
   author_id: string;
+}
+
+interface MilestoneRow {
+  idea_id: string;
+  idea_title: string;
+  author_id: string;
+  milestone: number;
 }
 
 interface ReminderRow {
@@ -29,8 +37,8 @@ function daysUntil(iso: string): number {
 }
 
 /**
- * Daily job. Expires overdue reservations, reopens their ideas, and sends the
- * two reminders.
+ * Daily job. Expires overdue reservations, reopens their ideas, sends the two
+ * reminders, and tells authors when their idea crosses a vote threshold.
  *
  * Both database functions mutate and return their rows in a single statement,
  * so a repeated or concurrent run finds nothing left to claim and sends
@@ -40,9 +48,10 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
   if (!isAuthorisedCron(request, env)) return json({ error: "unauthorized" }, 401);
 
   try {
-    const [expired, reminders] = await Promise.all([
+    const [expired, reminders, milestones] = await Promise.all([
       rpc<ExpiredRow[]>(env, "expire_due_claims"),
       rpc<ReminderRow[]>(env, "claim_reminders_due"),
+      rpc<MilestoneRow[]>(env, "vote_milestones_due"),
     ]);
 
     for (const row of expired) {
@@ -71,9 +80,22 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
       }
     }
 
+    for (const row of milestones) {
+      const author = (await recipientsFor(env, [row.author_id])).get(row.author_id);
+      if (author) {
+        await send(
+          env,
+          author,
+          voteMilestone(row.idea_title, row.milestone),
+          `/idea/?id=${row.idea_id}`,
+        );
+      }
+    }
+
     return json({
       expired: expired.length,
       reminded: reminders.length,
+      milestones: milestones.length,
       at: new Date().toISOString(),
     });
   } catch (error) {

@@ -8,7 +8,13 @@ import { RequireSession } from "@/components/require-session";
 import { IdeaCard } from "@/components/idea-card";
 import { Segmented } from "@/components/segmented";
 import { Select } from "@/components/select";
-import { listFacets, listOpenIdeas, type IdeaCardModel, type IdeaSort } from "@/lib/api/ideas";
+import {
+  listFacets,
+  listOpenIdeas,
+  searchIdeas,
+  type IdeaCardModel,
+  type IdeaSort,
+} from "@/lib/api/ideas";
 
 export default function IdeasPage() {
   return (
@@ -23,6 +29,8 @@ function IdeasBoard() {
   const { user } = useSession();
   const viewerId = user?.id ?? "";
 
+  const [query, setQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
   const [sort, setSort] = useState<IdeaSort>("votes");
   const [tag, setTag] = useState("");
   const [campus, setCampus] = useState("");
@@ -32,14 +40,25 @@ function IdeasBoard() {
     campuses: [],
   });
 
+  // Typing runs a query per keystroke otherwise, and the search touches two
+  // indexes plus a vote lookup.
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(query.trim()), 250);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const searching = debounced.length >= 2;
+
   const load = useCallback(
     () =>
-      listOpenIdeas(viewerId, {
-        sort,
-        tag: tag || undefined,
-        campus: campus || undefined,
-      }),
-    [viewerId, sort, tag, campus],
+      searching
+        ? searchIdeas(debounced, viewerId)
+        : listOpenIdeas(viewerId, {
+            sort,
+            tag: tag || undefined,
+            campus: campus || undefined,
+          }),
+    [searching, debounced, viewerId, sort, tag, campus],
   );
 
   useEffect(() => {
@@ -74,7 +93,26 @@ function IdeasBoard() {
         </Link>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3 border-y-2 border-ink py-4">
+      <div className="mt-8 flex items-center gap-3">
+        <input
+          type="search"
+          className="input"
+          aria-label={t("ideas.searchLabel")}
+          placeholder={t("ideas.searchPlaceholder")}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+        {query.length > 0 ? (
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setQuery("")}>
+            {t("ideas.searchClear")}
+          </button>
+        ) : null}
+      </div>
+
+      <div
+        className="mt-4 flex flex-wrap items-center gap-3 border-y-2 border-ink py-4"
+        hidden={searching}
+      >
         <Segmented
           label={t("ideas.sortVotes")}
           value={sort}
@@ -112,7 +150,9 @@ function IdeasBoard() {
       {cards === null ? (
         <p className="mt-6 text-sm text-ink-faint">{t("common.loading")}</p>
       ) : cards.length === 0 ? (
-        <p className="surface mt-6 p-10 text-center text-ink-faint">{t("ideas.empty")}</p>
+        <p className="surface mt-6 p-10 text-center text-ink-faint">
+          {searching ? t("ideas.searchEmpty", { query: debounced }) : t("ideas.empty")}
+        </p>
       ) : (
         <div className="mt-6 flex flex-col gap-3">
           {cards.map((card) => (

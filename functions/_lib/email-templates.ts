@@ -233,3 +233,27 @@ export function weeklyDigest(
 export function pickCopy(copy: Copy, locale: Locale): EmailCopy {
   return copy[locale] ?? copy.fr;
 }
+
+/** Sent once per threshold crossed, never once per vote. */
+export function voteMilestone(title: string, milestone: number): Record<Locale, EmailCopy> {
+  return {
+    fr: {
+      subject: `${milestone} votes pour « ${title} »`,
+      heading: `Ton idée a passé les ${milestone} votes`,
+      body: [
+        `« ${title} » vient d'atteindre ${milestone} votes.`,
+        "C'est le signal qu'un élève cherche en parcourant le tableau. Si tu connais quelqu'un capable de la construire, c'est le moment de lui en parler.",
+      ],
+      ctaLabel: "Voir l'idée",
+    },
+    en: {
+      subject: `${milestone} votes for “${title}”`,
+      heading: `Your idea passed ${milestone} votes`,
+      body: [
+        `“${title}” has just reached ${milestone} votes.`,
+        "That is the signal a student looks for when scanning the board. If you know someone who could build it, now is the moment to tell them.",
+      ],
+      ctaLabel: "Open the idea",
+    },
+  };
+}

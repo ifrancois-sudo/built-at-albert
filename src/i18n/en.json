@@ -14,7 +14,10 @@
     "optional": "optional",
     "required": "required",
     "genericError": "Something went wrong. Try again in a moment.",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "legalNotice": "Legal notice",
+    "privacy": "Privacy",
+    "deletedAccount": "Deleted account"
   },
   "nav": {
     "ideas": "Ideas",
@@ -113,7 +116,13 @@
     "fieldLanguage": "Writing language",
     "newSubmit": "Send for review",
     "newDone": "Idea sent. An admin reviews it before it goes live.",
-    "rejectedReason": "Reason for rejection"
+    "rejectedReason": "Reason for rejection",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search for an idea…",
+    "searchEmpty": "No idea matches “{query}”.",
+    "searchClear": "Clear",
+    "duplicateTitle": "Close ideas already exist",
+    "duplicateBody": "Vote for one of these rather than posting a second: votes count for more when they are not split."
   },
   "claim": {
     "cta": "I'll build this tool",
@@ -223,5 +232,22 @@
     "buildTitle": "Can you build?",
     "buildBody": "Claim an idea in one click. You get {days} days, and you can release it whenever you want.",
     "buildButton": "Browse the open ideas"
+  },
+  "danger": {
+    "title": "Delete my account",
+    "body": "Your account, your votes and your personal details are removed at once. The ideas you posted and the tools you delivered stay online without your name, so other people's votes are not erased.",
+    "release": "Any idea you had claimed goes back on the board.",
+    "confirm": "Confirm deletion",
+    "cancel": "Cancel",
+    "start": "Delete my account",
+    "typeToConfirm": "Type DELETE to confirm",
+    "word": "DELETE",
+    "failed": "Deletion failed. Try again or write to the administrator."
+  },
+  "profile": {
+    "title": "My profile",
+    "body": "Your name shows next to your ideas. Class year and campus are only used for filtering, and may be left empty.",
+    "save": "Save",
+    "saved": "Profile updated."
   }
 }

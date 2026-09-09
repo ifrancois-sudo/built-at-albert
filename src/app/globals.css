@@ -13,11 +13,16 @@
   --color-paper-sunk: #eae5d8;
   --color-ink: #12100c;
   --color-ink-soft: #57513f;
-  --color-ink-faint: #7d7663;
+  --color-ink-faint: #706a58;
   --color-rule: #dcd5c4;
-  --color-rule-strong: #c4bba4;
+  --color-rule-strong: #c4bba4; /* decorative rules only, never a control edge */
 
+  /* The bright vermilion is display-only: it clears 3:1 on paper, which WCAG
+     asks of large text and of icons, but not the 4.5:1 small text needs.
+     accent-strong fills buttons that carry white labels, accent-ink sets any
+     accented text below 24px. */
   --color-accent: #e2483c;
+  --color-accent-strong: #d8301f;
   --color-accent-soft: #fbe7e4;
   --color-accent-ink: #ab2f25;
 
@@ -102,18 +107,13 @@
     border-radius: var(--radius-card);
   }
 
-  .surface-quiet {
-    background: var(--color-paper-raised);
-    border: 1px solid var(--color-rule-strong);
-    border-radius: var(--radius-card);
-  }
-
   .kicker {
     font-family: var(--font-mono);
     font-size: 0.8125rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-accent);
+    /* 13px, so it needs the small-text ratio, not the display one. */
+    color: var(--color-accent-ink);
   }
 
   .meta {
@@ -154,8 +154,8 @@
   }
 
   .btn-primary {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
+    background: var(--color-accent-strong);
+    border-color: var(--color-accent-strong);
     color: #ffffff;
   }
 
@@ -183,7 +183,7 @@
 
   .btn-ghost:not(:disabled):hover {
     color: var(--color-ink);
-    border-color: var(--color-rule-strong);
+    border-color: var(--color-ink-faint);
   }
 
   .btn-danger {

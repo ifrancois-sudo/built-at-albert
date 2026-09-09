@@ -14,7 +14,10 @@
     "optional": "facultatif",
     "required": "obligatoire",
     "genericError": "Quelque chose n'a pas fonctionné. Réessaie dans un instant.",
-    "skipToContent": "Aller au contenu"
+    "skipToContent": "Aller au contenu",
+    "legalNotice": "Mentions légales",
+    "privacy": "Confidentialité",
+    "deletedAccount": "Compte supprimé"
   },
   "nav": {
     "ideas": "Idées",
@@ -113,7 +116,13 @@
     "fieldLanguage": "Langue de rédaction",
     "newSubmit": "Envoyer à la modération",
     "newDone": "Idée envoyée. Un admin la relit avant publication.",
-    "rejectedReason": "Motif du refus"
+    "rejectedReason": "Motif du refus",
+    "searchLabel": "Rechercher",
+    "searchPlaceholder": "Chercher une idée…",
+    "searchEmpty": "Aucune idée ne correspond à « {query} ».",
+    "searchClear": "Effacer",
+    "duplicateTitle": "Des idées proches existent déjà",
+    "duplicateBody": "Vote pour l'une d'elles plutôt que d'en créer une deuxième : les votes comptent double quand ils sont rassemblés."
   },
   "claim": {
     "cta": "Je développe cet outil",
@@ -223,5 +232,22 @@
     "buildTitle": "Tu sais construire ?",
     "buildBody": "Réserve une idée en un clic. Tu as {days} jours, et tu peux la libérer quand tu veux.",
     "buildButton": "Parcourir les idées ouvertes"
+  },
+  "danger": {
+    "title": "Supprimer mon compte",
+    "body": "Ton compte, tes votes et tes informations personnelles sont retirés immédiatement. Les idées que tu as proposées et les outils que tu as livrés restent en ligne, sans ton nom, pour ne pas effacer les votes des autres.",
+    "release": "Les idées que tu as réservées repartent en libre.",
+    "confirm": "Confirmer la suppression",
+    "cancel": "Annuler",
+    "start": "Supprimer mon compte",
+    "typeToConfirm": "Tape SUPPRIMER pour confirmer",
+    "word": "SUPPRIMER",
+    "failed": "La suppression a échoué. Réessaie ou écris à l'administrateur."
+  },
+  "profile": {
+    "title": "Mon profil",
+    "body": "Ton nom apparaît à côté de tes idées. La promo et le campus servent uniquement à filtrer, tu peux les laisser vides.",
+    "save": "Enregistrer",
+    "saved": "Profil mis à jour."
   }
 }

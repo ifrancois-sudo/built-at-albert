@@ -7,6 +7,8 @@ import { useLocale, useT } from "@/i18n/provider";
 import { RequireSession } from "@/components/require-session";
 import { StatusBadge } from "@/components/status-badge";
 import { ClaimTracker } from "@/app/me/claim-tracker";
+import { ProfileForm } from "@/components/profile-form";
+import { DeleteAccount } from "@/components/delete-account";
 import { supabase } from "@/lib/supabase/client";
 import { listMyActiveClaims } from "@/lib/api/claims";
 import { formatDate } from "@/lib/format";
@@ -149,6 +151,14 @@ function MySpace() {
           </ul>
         )}
       </section>
+
+      <section className="mt-12">
+        <h2 className="text-xl">{t("profile.title")}</h2>
+        <ProfileForm />
+      </section>
+
+      <DeleteAccount />
+
     </div>
   );
 }

@@ -7,7 +7,7 @@ import type { IdeaStatus } from "@/lib/database.types";
 // act on, and it should be the loudest thing in a row of labels.
 const TONE: Record<IdeaStatus, string> = {
   pending: "text-ink-faint",
-  open: "badge-solid bg-accent",
+  open: "badge-solid bg-accent-strong",
   claimed: "text-signal",
   delivered: "badge-solid bg-good",
   rejected: "text-bad",

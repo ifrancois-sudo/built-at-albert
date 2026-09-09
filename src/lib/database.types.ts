@@ -19,7 +19,8 @@ export type ProfileRow = {
 
 export type IdeaRow = {
   id: string;
-  author_id: string;
+  /** Null once the author has erased their account; the idea itself stays. */
+  author_id: string | null;
   title: string;
   problem: string;
   description: string;
@@ -28,6 +29,8 @@ export type IdeaRow = {
   status: IdeaStatus;
   rejected_reason: string | null;
   vote_count: number;
+  /** Highest vote threshold already announced to the author. */
+  notified_votes: number;
   campus: string | null;
   created_at: string;
   published_at: string | null;
@@ -55,7 +58,8 @@ export type ProjectRow = {
   id: string;
   claim_id: string;
   idea_id: string;
-  author_id: string;
+  /** Null once the author has erased their account; the tool stays listed. */
+  author_id: string | null;
   url: string;
   repo_url: string | null;
   description: string;
@@ -135,6 +139,13 @@ export type Database = {
           author_id: string;
         }[];
       };
+      vote_milestones_due: {
+        Args: Record<string, never>;
+        Returns: { idea_id: string; idea_title: string; author_id: string; milestone: number }[];
+      };
+      search_ideas: { Args: { p_query: string }; Returns: IdeaRow[] };
+      similar_ideas: { Args: { p_title: string }; Returns: IdeaRow[] };
+      release_claims_for_user: { Args: { p_user_id: string }; Returns: number };
       claim_reminders_due: {
         Args: Record<string, never>;
         Returns: {

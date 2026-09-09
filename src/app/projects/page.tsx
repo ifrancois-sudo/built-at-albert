@@ -77,7 +77,7 @@ function Gallery() {
                 </h2>
                 <p className="prose-body mt-3 line-clamp-3 flex-1">{project.description}</p>
                 <p className="meta mt-4">
-                  {t("ideas.byAuthor", { name: displayName(authors.get(project.author_id), "—") })}
+                  {t("ideas.byAuthor", { name: displayName(authors.get(project.author_id ?? ""), "—") })}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a

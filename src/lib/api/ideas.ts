@@ -54,7 +54,7 @@ export async function listOpenIdeas(
 
   return ideas.map((idea) => ({
     idea,
-    author: profiles.get(idea.author_id),
+    author: profiles.get(idea.author_id ?? ""),
     hasVoted: voted.has(idea.id),
   }));
 }
@@ -84,7 +84,7 @@ export async function getIdeaDetail(
 
   return {
     idea,
-    author: profiles.get(idea.author_id),
+    author: profiles.get(idea.author_id ?? ""),
     hasVoted: Boolean(voteResult.data),
     activeClaim,
     claimant: activeClaim ? profiles.get(activeClaim.user_id) : undefined,
@@ -138,4 +138,33 @@ export async function toggleVote(ideaId: string, userId: string, hasVoted: boole
   return hasVoted
     ? supabase().from("votes").delete().eq("idea_id", ideaId).eq("user_id", userId)
     : supabase().from("votes").insert({ idea_id: ideaId, user_id: userId });
+}
+
+/** Full text plus fuzzy title matching, ranked by relevance then by votes. */
+export async function searchIdeas(query: string, viewerId: string): Promise<IdeaCardModel[]> {
+  const { data: ideas } = await supabase().rpc("search_ideas", { p_query: query });
+  if (!ideas || ideas.length === 0) return [];
+
+  const [profiles, votes] = await Promise.all([
+    fetchProfiles(ideas.map((idea) => idea.author_id)),
+    supabase()
+      .from("votes")
+      .select("idea_id")
+      .eq("user_id", viewerId)
+      .in("idea_id", ideas.map((idea) => idea.id)),
+  ]);
+
+  const voted = new Set((votes.data ?? []).map((vote) => vote.idea_id));
+
+  return ideas.map((idea) => ({
+    idea,
+    author: profiles.get(idea.author_id ?? ""),
+    hasVoted: voted.has(idea.id),
+  }));
+}
+
+/** Ideas whose title is close to this one, for the duplicate warning. */
+export async function similarIdeas(title: string): Promise<IdeaRow[]> {
+  const { data } = await supabase().rpc("similar_ideas", { p_title: title });
+  return data ?? [];
 }

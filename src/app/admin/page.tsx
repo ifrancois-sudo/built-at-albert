@@ -147,7 +147,7 @@ function AdminConsole() {
               <ModerationCard
                 key={idea.id}
                 idea={idea}
-                authorName={displayName(data.people.get(idea.author_id), "—")}
+                authorName={displayName(data.people.get(idea.author_id ?? ""), "—")}
                 createdLabel={formatDate(idea.created_at, locale)}
                 onDone={refresh}
               />

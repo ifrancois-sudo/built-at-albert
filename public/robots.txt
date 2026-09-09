@@ -1,0 +1,6 @@
+# Built at Albert is an internal platform for Albert School members.
+# Nothing here is meant for search engines, and the pages already carry a
+# noindex directive; this states the same thing before a crawler fetches them.
+
+User-agent: *
+Disallow: /

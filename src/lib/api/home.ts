@@ -82,7 +82,7 @@ export async function loadHome(viewerId: string): Promise<HomeSnapshot> {
     counts: { open, claimed, delivered },
     topIdeas: topIdeas.map((idea) => ({
       idea,
-      author: authors.get(idea.author_id),
+      author: authors.get(idea.author_id ?? ""),
       hasVoted: voted.has(idea.id),
     })),
     latestProjects: projects.map((project) => ({

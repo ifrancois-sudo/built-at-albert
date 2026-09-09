@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useSession } from "@/lib/session";
 import { useLocale, useT } from "@/i18n/provider";
 import { RequireSession } from "@/components/require-session";
 import { FormMessage } from "@/components/form-message";
-import { submitIdea } from "@/lib/api/ideas";
+import { similarIdeas, submitIdea } from "@/lib/api/ideas";
 import { errorMessageKey } from "@/lib/errors";
 import { LOCALES, type Locale, type MessageKey } from "@/i18n";
+import type { IdeaRow } from "@/lib/database.types";
 import { Segmented } from "@/components/segmented";
 
 export default function NewIdeaPage() {
@@ -27,6 +28,29 @@ function NewIdeaForm() {
   const [error, setError] = useState<MessageKey | null>(null);
   const [done, setDone] = useState(false);
   const [language, setLanguage] = useState<Locale>(locale);
+  const [title, setTitle] = useState("");
+  const [duplicates, setDuplicates] = useState<IdeaRow[]>([]);
+
+  // Warns while the title is being written rather than after submitting, when
+  // the cost of starting over is what makes people post the duplicate anyway.
+  useEffect(() => {
+    const trimmed = title.trim();
+    let cancelled = false;
+
+    // Clearing goes through the same deferred path as a lookup, so the panel is
+    // never updated synchronously from the effect body.
+    const timer = setTimeout(() => {
+      const lookup = trimmed.length < 6 ? Promise.resolve<IdeaRow[]>([]) : similarIdeas(trimmed);
+      void lookup.then((rows) => {
+        if (!cancelled) setDuplicates(rows);
+      });
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [title]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -79,8 +103,39 @@ function NewIdeaForm() {
           <label className="field-label" htmlFor="title">
             {t("ideas.fieldTitle")}
           </label>
-          <input id="title" name="title" required minLength={3} maxLength={120} className="input" />
+          <input
+            id="title"
+            name="title"
+            required
+            minLength={3}
+            maxLength={120}
+            className="input"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
           <p className="field-hint">{t("ideas.fieldTitleHint")}</p>
+
+          {duplicates.length > 0 ? (
+            <aside className="mt-4 rounded-[5px] border-2 border-signal bg-signal-soft p-5">
+              <p className="kicker text-signal">{t("ideas.duplicateTitle")}</p>
+              <ul className="mt-3 flex flex-col gap-2">
+                {duplicates.map((idea) => (
+                  <li key={idea.id}>
+                    <Link
+                      href={`/idea/?id=${idea.id}`}
+                      className="underline underline-offset-4 hover:text-accent-ink"
+                    >
+                      {idea.title}
+                    </Link>{" "}
+                    <span className="meta">
+                      {t.plural("ideas.voteCount", "ideas.voteCountPlural", idea.vote_count)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="prose-body mt-3">{t("ideas.duplicateBody")}</p>
+            </aside>
+          ) : null}
         </div>
 
         <div>

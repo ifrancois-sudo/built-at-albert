@@ -80,7 +80,7 @@ export function Home() {
                       ? t("claim.expiresToday")
                       : t.plural("claim.daysLeft", "claim.daysLeftPlural", left)}
                   </span>
-                  <Link href={`/idea/?id=${claim.idea_id}`} className="text-xl hover:text-accent">
+                  <Link href={`/idea/?id=${claim.idea_id}`} className="text-xl hover:text-accent-ink">
                     {ideaTitle}
                   </Link>
                   <span className="meta">{formatDate(claim.expires_at, locale)}</span>
@@ -98,7 +98,7 @@ export function Home() {
       <section className="pb-14">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <h2 className="text-[2rem]">{t("home.topTitle")}</h2>
-          <Link href="/ideas/" className="meta underline underline-offset-4 hover:text-accent">
+          <Link href="/ideas/" className="meta underline underline-offset-4 hover:text-accent-ink">
             {t("home.topAll", { count: data.counts.open + data.counts.claimed })}
           </Link>
         </div>
@@ -116,7 +116,7 @@ export function Home() {
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <h2 className="text-[2rem]">{t("home.shippedTitle")}</h2>
           {data.latestProjects.length > 0 ? (
-            <Link href="/projects/" className="meta underline underline-offset-4 hover:text-accent">
+            <Link href="/projects/" className="meta underline underline-offset-4 hover:text-accent-ink">
               {t("home.shippedAll")}
             </Link>
           ) : null}

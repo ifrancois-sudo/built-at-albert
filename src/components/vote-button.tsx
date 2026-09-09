@@ -62,8 +62,8 @@ export function VoteButton({
       onClick={onClick}
       className={`group min-w-[96px] rounded-[5px] border-2 px-3 py-2.5 text-center transition-colors ${
         state.hasVoted
-          ? "border-accent bg-accent text-white"
-          : "border-transparent hover:border-rule-strong"
+          ? "border-accent-strong bg-accent-strong text-white"
+          : "border-transparent hover:border-ink-faint"
       } ${pending ? "opacity-60" : ""}`}
     >
       <span className={`tally block ${state.hasVoted ? "text-white" : ""}`}>{state.count}</span>

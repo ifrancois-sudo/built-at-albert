@@ -42,7 +42,7 @@ export function IdeaCard({ card, viewerId }: { card: IdeaCardModel; viewerId: st
         <p className="prose-body mt-2.5 line-clamp-2">{idea.problem}</p>
 
         <p className="meta mt-4">
-          {t("ideas.byAuthor", { name: displayName(author, "—") })}
+          {t("ideas.byAuthor", { name: displayName(author, t("common.deletedAccount")) })}
           {idea.tags.length > 0 ? ` · ${idea.tags.map((tag) => `#${tag}`).join(" ")}` : ""}
         </p>
       </div>
